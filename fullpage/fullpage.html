@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Jar</title>
+  <link rel="stylesheet" href="../styles/common.css">
+  <style>
+    html, body {
+      min-height: 100vh;
+      background: #FFF8EE;
+      overflow-x: hidden;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 32px;
+      background: #FFF8EE;
+      border-bottom: 1.5px solid #E6D5C3;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; }
+    .topbar-icon { width: 36px; height: 36px; }
+    .topbar-title {
+      font-size: 22px; font-weight: 700;
+      color: #4A3018; font-family: 'Fredoka', sans-serif;
+    }
+    .topbar-btn {
+      width: 34px; height: 34px;
+      border: none; background: rgba(196,168,112,0.2);
+      border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #8B5A2B; font-size: 16px;
+      transition: background 0.15s;
+    }
+    .topbar-btn:hover { background: rgba(196,168,112,0.4); }
+
+    /* ── Main layout ── */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 66px);
+    }
+
+    /* ── Left panel ── */
+    .left-panel {
+      padding: 40px 48px;
+      border-right: 1.5px solid #E6D5C3;
+    }
+    .left-headline {
+      font-size: 36px; font-weight: 700;
+      color: #4A3018;
+      font-family: 'Fredoka', sans-serif;
+      margin-bottom: 16px;
+    }
+    .left-intro {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; color: #8C6B4A;
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 480px;
+    }
+
+    /* Cookie type sections */
+    .cookie-section {
+      margin-bottom: 28px;
+      padding: 20px;
+      background: #fff;
+      border: 1.5px solid #E6D5C3;
+      border-radius: 16px;
+    }
+    .cookie-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .cookie-section-toggle {
+      position: relative;
+      width: 56px; height: 30px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .cookie-section-toggle input { display: none; }
+    .cs-track {
+      position: absolute; inset: 0;
+      border-radius: 15px;
+      background: #EDE0C8;
+      border: 1.5px solid rgba(139,90,43,.2);
+      transition: background 0.25s;
+      overflow: hidden;
+    }
+    .cs-thumb {
+      position: absolute;
+      width: 28px; height: 28px;
+      top: -0.5px; left: -0.5px;
+      transition: transform 0.25s cubic-bezier(.34,1.2,.64,1);
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.2));
+    }
+    .cs-thumb img { width: 100%; height: 100%; border-radius: 50%; }
+    .cookie-section-toggle input:checked ~ .cs-track { background: #8B5A2B; border-color: #6B4220; }
+    .cookie-section-toggle[data-flavor="matcha"] input:checked ~ .cs-track { background: #5E8C3C; }
+    .cookie-section-toggle[data-flavor="mm"] input:checked ~ .cs-track { background: #8B5A2B; }
+    .cookie-section-toggle[data-flavor="redvelvet"] input:checked ~ .cs-track { background: #B05050; }
+    .cookie-section-toggle input:checked ~ .cs-track .cs-thumb { transform: translateX(26px); }
+
+    .cookie-section-name {
+      font-size: 18px; font-weight: 600;
+      color: #4A3018;
+      font-family: 'Fredoka', sans-serif;
+    }
+    .cookie-section-body {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; color: #8C6B4A;
+      line-height: 1.6;
+    }
+
+    /* ── Right panel ── */
+    .right-panel {
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .right-title {
+      font-size: 28px; font-weight: 700;
+      color: #4A3018;
+      font-family: 'Fredoka', sans-serif;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    /* Big cookie jar illustration */
+    .jar-illustration {
+      width: 200px;
+      height: 260px;
+      position: relative;
+      margin-bottom: 32px;
+    }
+
+    .safe-unsafe {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      width: 100%;
+      max-width: 420px;
+    }
+    .safety-card {
+      background: #fff;
+      border: 1.5px solid #E6D5C3;
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .safety-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .safety-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .safety-icon.safe     { background: #EBF5EC; }
+    .safety-icon.unsafe   { background: #FDECEA; }
+    .safety-card-title {
+      font-size: 16px; font-weight: 600;
+      color: #4A3018;
+      font-family: 'Fredoka', sans-serif;
+    }
+    .safety-card-list {
+      list-style: none;
+    }
+    .safety-card-list li {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px; color: #8C6B4A;
+      padding: 4px 0;
+      border-top: 1px solid #F3E5D8;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .safety-card-list li::before { content: '·'; color: #C4A870; font-size: 16px; line-height: 0; }
+    .safety-card.safe   { border-left: 3px solid #4A7C4E; }
+    .safety-card.unsafe { border-left: 3px solid #C0392B; }
+
+    /* Settings shortcut */
+    .settings-shortcut {
+      margin-top: 32px;
+      text-align: center;
+    }
+    .settings-shortcut p {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px; color: #8C6B4A;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <svg class="topbar-icon" viewBox="0 0 40 40" fill="none">
+        <rect x="8" y="2" width="24" height="7" rx="3.5" fill="#C4952A"/>
+        <rect x="10" y="1" width="20" height="4" rx="2" fill="#E6CFA1"/>
+        <rect x="11" y="8" width="18" height="5" fill="#FFF8EE" stroke="#E6D5C3" stroke-width="1"/>
+        <path d="M5 13 C4 19 3 25 3 30 C3 36 10 39 20 39 C30 39 37 36 37 30 C37 25 36 19 35 13 Z" fill="#FFF8EE" stroke="#E6D5C3" stroke-width="1.5"/>
+        <circle cx="20" cy="26" r="9" fill="#C4952A" stroke="#A87240" stroke-width="1"/>
+        <circle cx="16" cy="23" r="1.8" fill="#4A2800"/>
+        <circle cx="23" cy="25" r="1.8" fill="#4A2800"/>
+        <circle cx="18" cy="29" r="1.5" fill="#4A2800"/>
+      </svg>
+      <span class="topbar-title">Cookie Jar</span>
+    </div>
+    <button class="topbar-btn" id="settingsBtn" title="Open settings" onclick="chrome.runtime.openOptionsPage()">⚙️</button>
+  </header>
+
+  <!-- Main two-column layout -->
+  <main class="main">
+
+    <!-- Left: Tailor your cookies -->
+    <div class="left-panel">
+      <h1 class="left-headline">Tailor your cookies!</h1>
+      <p class="left-intro">
+        Cookies are small bits of data stored in your browser that help websites remember things like your login, preferences, and settings to provide a smoother browsing experience.<br><br>
+        But not all cookies are created equally — some are used to track your activity across websites and sell that information to advertisers.
+      </p>
+
+      <!-- Session Cookies -->
+      <div class="cookie-section">
+        <div class="cookie-section-header">
+          <label class="cookie-section-toggle" data-flavor="choc">
+            <input type="checkbox" data-cat="session" checked>
+            <div class="cs-track">
+              <div class="cs-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="cookie-section-name">Session Cookies</span>
+        </div>
+        <p class="cookie-section-body">
+          Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.
+        </p>
+      </div>
+
+      <!-- Authentication Cookies -->
+      <div class="cookie-section">
+        <div class="cookie-section-header">
+          <label class="cookie-section-toggle" data-flavor="choc">
+            <input type="checkbox" data-cat="authentication" checked>
+            <div class="cs-track">
+              <div class="cs-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="cookie-section-name">Authentication Cookies</span>
+        </div>
+        <p class="cookie-section-body">
+          Authentication cookies keep you signed in to websites even as you navigate between pages. Without them you'd need to re-enter your password on every click. If stolen, attackers can log into your accounts without your password.
+        </p>
+      </div>
+
+      <!-- Tracking Cookies -->
+      <div class="cookie-section">
+        <div class="cookie-section-header">
+          <label class="cookie-section-toggle" data-flavor="mm">
+            <input type="checkbox" data-cat="tracking">
+            <div class="cs-track">
+              <div class="cs-thumb"><img src="../icons/cookie-mm.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="cookie-section-name">Tracking Cookies</span>
+        </div>
+        <p class="cookie-section-body">
+          Tracking cookies follow your activity across websites to build detailed profiles about you. In 2025, 93.7 billion stolen tracking cookies were found on the dark web — linked to Google, YouTube, and other major platforms.
+        </p>
+      </div>
+
+      <!-- Save button -->
+      <button class="btn btn-primary" id="saveFullPage" style="width:100%;margin-top:8px;padding:14px;font-size:16px;border-radius:14px">
+        Save preferences
+      </button>
+    </div>
+
+    <!-- Right: Safe vs Unsafe -->
+    <div class="right-panel">
+      <h2 class="right-title">Safe vs. Unsafe Cookies</h2>
+
+      <!-- Big cookie jar illustration -->
+      <div class="jar-illustration">
+        <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+          <!-- Lid -->
+          <rect x="40" y="8" width="120" height="24" rx="12" fill="#C4952A"/>
+          <rect x="44" y="4" width="112" height="14" rx="7" fill="#E6CFA1"/>
+          <!-- Neck -->
+          <rect x="52" y="30" width="96" height="20" fill="#FFF8EE" stroke="#E6D5C3" stroke-width="2"/>
+          <!-- Body -->
+          <path d="M24 50 C20 80 18 110 18 140 C18 190 50 210 100 210 C150 210 182 190 182 140 C182 110 180 80 176 50 Z" fill="#FFF8EE" stroke="#E6D5C3" stroke-width="2"/>
+          <!-- Glass shine -->
+          <path d="M30 55 C28 80 27 105 28 135" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round"/>
+          <!-- Dashed label outline -->
+          <path d="M35 90 C30 110 28 130 30 155 C32 175 50 185 100 185 C150 185 168 175 170 155 C172 130 170 110 165 90 Z" stroke="rgba(196,168,112,0.5)" stroke-width="2" stroke-dasharray="6 4" fill="none"/>
+          <!-- Safe cookies (green) -->
+          <circle cx="80" cy="115" r="22" fill="#7BAF58" stroke="#4E7E35" stroke-width="1.5"/>
+          <circle cx="72" cy="108" r="3.5" fill="#F2EDD4"/>
+          <circle cx="85" cy="112" r="3" fill="#F2EDD4"/>
+          <circle cx="74" cy="120" r="3" fill="#F2EDD4"/>
+          <!-- Safe label -->
+          <text x="80" y="148" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="10" fill="#4A7C4E">Session</text>
+          <!-- Tracking cookie (M&M) -->
+          <circle cx="130" cy="130" r="20" fill="#D4A843" stroke="#9B7322" stroke-width="1.5"/>
+          <circle cx="122" cy="123" r="3" fill="#E74C3C"/>
+          <circle cx="134" cy="124" r="3" fill="#3498DB"/>
+          <circle cx="122" cy="133" r="3" fill="#F1C40F"/>
+          <circle cx="135" cy="134" r="2.5" fill="#27AE60"/>
+          <!-- Warning mark on tracking cookie -->
+          <circle cx="145" cy="113" r="10" fill="#E74C3C"/>
+          <text x="145" y="117" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">!</text>
+        </svg>
+      </div>
+
+      <!-- Safe vs Unsafe cards -->
+      <div class="safe-unsafe">
+        <div class="safety-card safe">
+          <div class="safety-card-header">
+            <div class="safety-icon safe">🔒</div>
+            <div class="safety-card-title">Safe Cookies</div>
+          </div>
+          <ul class="safety-card-list">
+            <li>Session cookies</li>
+            <li>Authentication</li>
+            <li>Security tokens</li>
+            <li>Consent records</li>
+            <li>Load balancing</li>
+          </ul>
+        </div>
+        <div class="safety-card unsafe">
+          <div class="safety-card-header">
+            <div class="safety-icon unsafe">⚠️</div>
+            <div class="safety-card-title">Unsafe Cookies</div>
+          </div>
+          <ul class="safety-card-list">
+            <li>Cross-site tracking</li>
+            <li>Advertising profiles</li>
+            <li>Third-party trackers</li>
+            <li>Behavioral analytics</li>
+            <li>Zombie cookies</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="settings-shortcut">
+        <p>Want fine-grained control? Open the full settings to manage each cookie type individually.</p>
+        <button class="btn btn-outline" onclick="chrome.runtime.openOptionsPage()" style="font-size:14px;padding:10px 24px;border-radius:12px;border:1.5px solid #E6D5C3;color:#4A3018;background:transparent;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:500">
+          Open full settings →
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="../utils/cookie-classifier.js"></script>
+  <script>
+    'use strict';
+
+    async function loadAndSync() {
+      const data = await chrome.storage.local.get('preferences');
+      const prefs = data.preferences || {};
+      const cats  = prefs.categories || {};
+
+      document.querySelectorAll('[data-cat]').forEach(input => {
+        const cat = input.dataset.cat;
+        if (cat && cats[cat] !== undefined) input.checked = cats[cat];
+      });
+    }
+
+    document.querySelectorAll('[data-cat]').forEach(input => {
+      input.addEventListener('change', async () => {
+        const data = await chrome.storage.local.get('preferences');
+        const prefs = data.preferences || {};
+        if (!prefs.categories) prefs.categories = {};
+        prefs.categories[input.dataset.cat] = input.checked;
+        await chrome.storage.local.set({ preferences: prefs });
+      });
+    });
+
+    document.getElementById('saveFullPage')?.addEventListener('click', async () => {
+      const data = await chrome.storage.local.get('preferences');
+      const prefs = data.preferences || {};
+      if (!prefs.categories) prefs.categories = {};
+
+      document.querySelectorAll('[data-cat]').forEach(input => {
+        prefs.categories[input.dataset.cat] = input.checked;
+      });
+
+      await chrome.storage.local.set({ preferences: prefs });
+
+      const btn = document.getElementById('saveFullPage');
+      btn.textContent = 'Saved ✓';
+      setTimeout(() => { btn.textContent = 'Save preferences'; }, 2000);
+    });
+
+    loadAndSync();
+  </script>
+</body>
+</html>

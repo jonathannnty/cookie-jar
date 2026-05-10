@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome to Cookie Jar</title>
+  <link rel="stylesheet" href="../styles/common.css">
+  <style>
+    html, body { min-height: 100vh; background: var(--c-bg-alt); }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 64px 24px 48px;
+      background: linear-gradient(160deg, #F0C59C 0%, #D9AF83 100%);
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+    .hero-mission {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--c-teal);
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .hero-title {
+      font-size: clamp(56px, 8vw, 96px);
+      font-weight: 700;
+      color: #69513F;
+      line-height: 1;
+      margin-bottom: 16px;
+    }
+    .hero-sub {
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--c-muted);
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    /* ── Layout ── */
+    .main-panel {
+      max-width: 1200px;
+      margin: -32px auto 0;
+      padding: 0 24px 48px;
+    }
+    .glass-panel {
+      background: rgba(228, 246, 248, 0.14);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,.65);
+      border-radius: 58px;
+      box-shadow: 0 6px 28px rgba(77,102,204,.16);
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 48px;
+    }
+
+    /* ── Why section (left) ── */
+    .why-title {
+      font-size: 22px;
+      font-weight: 400;
+      font-style: italic;
+      color: var(--c-muted);
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+    .why-body {
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 300;
+      color: var(--c-muted);
+      line-height: 1.7;
+    }
+    .stat-callout {
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(139,90,43,.07);
+      border-left: 3px solid var(--c-primary);
+      border-radius: 0 var(--r-md) var(--r-md) 0;
+      font-size: 14px;
+      color: var(--c-fg);
+      font-family: var(--font-body);
+    }
+    .stat-callout strong { color: var(--c-primary); }
+
+    /* ── Prefs section (right) ── */
+    .prefs-title {
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--c-fg);
+      margin-bottom: 24px;
+    }
+
+    /* Mode selector pills */
+    .mode-selector {
+      display: flex;
+      background: var(--c-secondary);
+      border-radius: var(--r-pill);
+      padding: 4px;
+      margin-bottom: 24px;
+      width: fit-content;
+    }
+    .mode-btn {
+      padding: 8px 20px;
+      border-radius: var(--r-pill);
+      font-family: var(--font-ui);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--c-muted);
+      transition: all .2s;
+    }
+    .mode-btn.active {
+      background: var(--c-primary);
+      color: #fff;
+      box-shadow: var(--sh-sm);
+    }
+
+    /* Pref rows */
+    .pref-section { display: flex; flex-direction: column; gap: 0; }
+    .pref-group-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      padding: 8px 0 6px;
+      margin-top: 8px;
+    }
+    .pref-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      padding: 14px 16px;
+      border-radius: var(--r-md);
+      transition: background .15s;
+    }
+    .pref-row:hover { background: rgba(139,90,43,.05); }
+    .pref-row-info { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .pref-icon {
+      width: 38px; height: 38px;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .pref-name { font-size: 15px; font-weight: 500; color: var(--c-fg); }
+    .pref-desc { font-size: 12px; color: var(--c-muted); font-family: var(--font-body); margin-top: 1px; }
+    .required-tag {
+      font-size: 10px;
+      font-weight: 600;
+      color: #4A7C4E;
+      background: #EBF5EC;
+      padding: 2px 7px;
+      border-radius: var(--r-pill);
+      margin-top: 3px;
+      display: inline-block;
+    }
+
+    /* ── Cookie type cards ── */
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--c-fg);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--c-muted);
+      font-size: 16px;
+      margin-bottom: 32px;
+      font-family: var(--font-body);
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .cookie-card {
+      background: #fff;
+      border: 1.5px solid var(--c-border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+      transition: box-shadow .2s, transform .2s;
+    }
+    .cookie-card:hover { box-shadow: var(--sh-md); transform: translateY(-2px); }
+    .cookie-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .cookie-card-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .cookie-card-name { font-size: 18px; font-weight: 600; color: var(--c-fg); }
+    .cookie-card-type {
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      margin-top: 2px;
+      display: inline-block;
+    }
+    .cookie-card-desc {
+      font-family: var(--font-body);
+      font-size: 14px;
+      color: var(--c-muted);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .cookie-card-detail {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--c-fg);
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .cookie-card-lookout {
+      background: rgba(139,90,43,.06);
+      border-radius: var(--r-sm);
+      padding: 10px 12px;
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--c-fg);
+      line-height: 1.5;
+    }
+    .cookie-card-lookout::before {
+      content: '⚠️ Watch out: ';
+      font-weight: 600;
+    }
+
+    /* ── Footer CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 48px 24px 64px;
+    }
+    .cta-section .btn-primary {
+      font-size: 17px;
+      padding: 16px 48px;
+      border-radius: var(--r-xl);
+      box-shadow: var(--sh-md);
+    }
+    .cta-note {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--c-muted);
+      font-family: var(--font-body);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <header class="hero">
+    <p class="hero-mission">our mission</p>
+    <h1 class="hero-title">Cookie Jar</h1>
+    <p class="hero-sub">Manage your cookie preferences at a glance — and set defaults so you never have to choose between convenience and privacy.</p>
+  </header>
+
+  <!-- Glass panel: Why + Prefs -->
+  <div class="main-panel">
+    <div class="glass-panel">
+
+      <!-- Left: Why care -->
+      <div class="why-col">
+        <h2 class="why-title">Why should you care about cookies?</h2>
+        <p class="why-body">
+          Cookies are bits of information stored in your browser that help tailor your experience — but some cookies take it a step too far, using that information to target ads and build detailed profiles of your online activity.
+        </p>
+        <div class="stat-callout">
+          <strong>93.7 billion</strong> stolen tracking cookies were found on the dark web in 2025 — linked to major platforms like Google and YouTube — allowing attackers to log into accounts <em>without passwords</em>.
+        </div>
+        <p class="why-body" style="margin-top:16px;">
+          With Cookie Jar, you can manage your preferences at a glance. Set defaults once and the extension handles the rest automatically on every site you visit.
+        </p>
+      </div>
+
+      <!-- Right: Preferences -->
+      <div class="prefs-col">
+        <h3 class="prefs-title">Set your default preferences:</h3>
+
+        <!-- Simple / Advanced mode -->
+        <div class="mode-selector">
+          <button class="mode-btn active" id="btnSimple">Simple</button>
+          <button class="mode-btn" id="btnAdvanced">Advanced</button>
+        </div>
+
+        <!-- Simple mode -->
+        <div class="pref-section" id="simplePrefs">
+          <div class="pref-group-label">Always On</div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#EBF5EC">🔒</div>
+              <div>
+                <div class="pref-name">Necessary Cookies</div>
+                <div class="pref-desc">Login, security, core functionality</div>
+                <span class="required-tag">Always required</span>
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" checked disabled>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="pref-group-label" style="margin-top:16px">Optional</div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#FDECEA">⚙️</div>
+              <div>
+                <div class="pref-name">Optional Cookies</div>
+                <div class="pref-desc">Analytics, tracking, advertising, preferences</div>
+              </div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="simpleOptional">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Advanced mode -->
+        <div class="pref-section hidden" id="advancedPrefs">
+          <div class="pref-group-label">Necessary</div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#EBF5EC">🔒</div>
+              <div>
+                <div class="pref-name">Necessary</div>
+                <div class="pref-desc">Core site functionality</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="necessary" checked disabled><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#EBF3FA">⏱️</div>
+              <div>
+                <div class="pref-name">Session</div>
+                <div class="pref-desc">Deleted when you close your browser</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="session" checked><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#F3EEF8">🔑</div>
+              <div>
+                <div class="pref-name">Authentication</div>
+                <div class="pref-desc">Keep you logged in</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="authentication" checked><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-group-label" style="margin-top:16px">Optional</div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#E8F8F5">⚙️</div>
+              <div>
+                <div class="pref-name">Functional</div>
+                <div class="pref-desc">Language, theme, saved settings</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="functional" checked><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#FDF0E8">📊</div>
+              <div>
+                <div class="pref-name">Analytics</div>
+                <div class="pref-desc">Site usage metrics</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="analytics"><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#FDECEA">👁️</div>
+              <div>
+                <div class="pref-name">Tracking</div>
+                <div class="pref-desc">Cross-site behavioral profiling</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="tracking"><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#FDECEA">📢</div>
+              <div>
+                <div class="pref-name">Advertising</div>
+                <div class="pref-desc">Targeted ads and conversion tracking</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="advertising"><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#FEF5E7">🔗</div>
+              <div>
+                <div class="pref-name">Third-party</div>
+                <div class="pref-desc">From domains other than this site</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="third-party"><span class="toggle-track"></span></label>
+          </div>
+
+          <div class="pref-row">
+            <div class="pref-row-info">
+              <div class="pref-icon" style="background:#F2F3F4">❓</div>
+              <div>
+                <div class="pref-name">Unknown</div>
+                <div class="pref-desc">Unidentified purpose</div>
+              </div>
+            </div>
+            <label class="toggle"><input type="checkbox" data-cat="unknown"><span class="toggle-track"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cookie type education cards -->
+    <div style="padding: 64px 0 0">
+      <h2 class="section-title">Understanding your cookies</h2>
+      <p class="section-sub">Tap a card to learn what each type collects and what to watch out for.</p>
+      <div class="cards-grid" id="cardsGrid"></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <button class="btn btn-primary" id="saveBtn">Save preferences &amp; get started →</button>
+    <p class="cta-note">You can change these anytime by clicking the Cookie Jar icon in your browser toolbar.</p>
+  </div>
+
+  <script src="../utils/cookie-classifier.js"></script>
+  <script src="onboarding.js"></script>
+</body>
+</html>

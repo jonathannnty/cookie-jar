@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- Jar lid -->
+  <rect x="24" y="8" width="80" height="18" rx="9" fill="#C4952A"/>
+  <rect x="28" y="6" width="72" height="8" rx="4" fill="#E6CFA1"/>
+  <!-- Jar neck -->
+  <rect x="32" y="24" width="64" height="14" fill="#FAF7F2" stroke="#E6D5C3" stroke-width="2"/>
+  <!-- Jar body -->
+  <path d="M18 38 C14 60 12 80 12 96 C12 112 36 122 64 122 C92 122 116 112 116 96 C116 80 114 60 110 38 Z"
+        fill="rgba(255,251,245,0.95)" stroke="#E6D5C3" stroke-width="2.5"/>
+  <!-- Glass highlight -->
+  <path d="M22 42 C20 62 19 80 20 94" stroke="rgba(255,255,255,0.7)" stroke-width="4" stroke-linecap="round"/>
+  <!-- Chocolate chips -->
+  <ellipse cx="50" cy="70" rx="7" ry="5" fill="#8B5A2B" transform="rotate(-15 50 70)"/>
+  <ellipse cx="75" cy="80" rx="7" ry="5" fill="#8B5A2B" transform="rotate(10 75 80)"/>
+  <ellipse cx="60" cy="95" rx="6" ry="4" fill="#8B5A2B" transform="rotate(-5 60 95)"/>
+  <ellipse cx="44" cy="95" rx="5" ry="4" fill="#6B4420" transform="rotate(20 44 95)"/>
+  <ellipse cx="82" cy="65" rx="5" ry="4" fill="#6B4420" transform="rotate(-10 82 65)"/>
+  <!-- Cookie icon in jar -->
+  <circle cx="64" cy="58" r="16" fill="#C4952A" stroke="#A87240" stroke-width="1.5"/>
+  <circle cx="58" cy="53" r="2.5" fill="#4A3018"/>
+  <circle cx="68" cy="62" r="2.5" fill="#4A3018"/>
+  <circle cx="61" cy="64" r="2" fill="#4A3018"/>
+  <circle cx="70" cy="52" r="2" fill="#4A3018"/>
+</svg>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <defs>
+    <filter id="b" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.48" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <radialGradient id="bg" cx="38%" cy="35%" r="70%">
+      <stop offset="0%"   stop-color="#DCAF78"/>
+      <stop offset="55%"  stop-color="#D5A170"/>
+      <stop offset="100%" stop-color="#BF8A58"/>
+    </radialGradient>
+    <radialGradient id="chip" cx="35%" cy="30%" r="75%">
+      <stop offset="0%"   stop-color="#8E6353"/>
+      <stop offset="100%" stop-color="#5E3A3A"/>
+    </radialGradient>
+    <clipPath id="c"><circle cx="20" cy="20" r="19.5"/></clipPath>
+  </defs>
+  <g filter="drop-shadow(0 2px 3px rgba(94,58,58,0.4))">
+    <g clip-path="url(#c)">
+      <circle cx="20" cy="20" r="17" fill="url(#bg)" filter="url(#b)"/>
+      <ellipse cx="14.8" cy="12.3" rx="2.9" ry="2.1" transform="rotate(-15 14.8 12.3)" fill="url(#chip)"/>
+      <ellipse cx="14.0" cy="21.6" rx="2.8" ry="2.1" transform="rotate(10 14.0 21.6)"  fill="url(#chip)"/>
+      <ellipse cx="21.4" cy="27.1" rx="2.9" ry="2.1" transform="rotate(-5 21.4 27.1)"  fill="url(#chip)"/>
+      <ellipse cx="26.3" cy="8.4"  rx="2.9" ry="2.1" transform="rotate(20 26.3 8.4)"   fill="url(#chip)"/>
+      <ellipse cx="30.9" cy="16.5" rx="2.9" ry="2.0" transform="rotate(-10 30.9 16.5)" fill="url(#chip)"/>
+    </g>
+  </g>
+</svg>

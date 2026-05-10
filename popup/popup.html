@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cookie Jar</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+<div class="widget">
+
+  <!-- ══ Wooden header bar ══ -->
+  <div class="widget-header">
+    <div class="widget-header-left">
+      <svg class="header-jar-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="8" y="2" width="24" height="7" rx="3.5" fill="#6B4220"/>
+        <rect x="10" y="1" width="20" height="4" rx="2" fill="#8B6030"/>
+        <rect x="11" y="8" width="18" height="5" fill="#FFF8EE" stroke="#C4A870" stroke-width="1"/>
+        <path d="M5 13 C4 19 3 25 3 30 C3 36 10 39 20 39 C30 39 37 36 37 30 C37 25 36 19 35 13 Z" fill="#FFF8EE" stroke="#C4A870" stroke-width="1.5"/>
+        <path d="M7 14 C6.5 20 6 26 7 30" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/>
+        <circle cx="20" cy="26" r="8" fill="#D4A843" stroke="#9B7322" stroke-width="1"/>
+        <circle cx="17" cy="23" r="1.5" fill="#3D1C00"/>
+        <circle cx="22" cy="25" r="1.5" fill="#3D1C00"/>
+        <circle cx="18" cy="28" r="1.2" fill="#3D1C00"/>
+      </svg>
+    </div>
+    <span class="widget-title">Cookie Jar</span>
+    <div class="widget-header-right">
+      <button class="header-btn" id="btnFullPage" title="Open full page">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M10 2h4v4M14 2l-6 6M6 4H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-3"/>
+        </svg>
+      </button>
+      <button class="header-btn" id="btnSettings" title="Settings">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="8" cy="8" r="2.5"/>
+          <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ Jar body (cookie list) ══ -->
+  <div class="widget-body" id="widgetBody">
+
+    <!-- Row: Session Cookies -->
+    <div class="toggle-row" data-cat="session">
+      <label class="cookie-toggle" data-flavor="choc">
+        <input type="checkbox" id="tog-session" checked>
+        <div class="cookie-track">
+          <div class="cookie-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
+        </div>
+      </label>
+      <span class="toggle-label">Session Cookies</span>
+      <button class="info-btn" data-cat="session">i</button>
+    </div>
+
+    <div class="toggle-divider"></div>
+
+    <!-- Row: Auth Cookies -->
+    <div class="toggle-row" data-cat="authentication">
+      <label class="cookie-toggle" data-flavor="matcha">
+        <input type="checkbox" id="tog-auth" checked>
+        <div class="cookie-track">
+          <div class="cookie-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
+        </div>
+      </label>
+      <span class="toggle-label">Auth Cookies</span>
+      <button class="info-btn" data-cat="authentication">i</button>
+    </div>
+
+    <div class="toggle-divider"></div>
+
+    <!-- Row: Tracking Cookies -->
+    <div class="toggle-row" data-cat="tracking">
+      <label class="cookie-toggle" data-flavor="mm">
+        <input type="checkbox" id="tog-tracking">
+        <div class="cookie-track">
+          <div class="cookie-thumb"><img src="../icons/cookie-mm.svg" alt=""></div>
+        </div>
+      </label>
+      <span class="toggle-label">Tracking Cookies</span>
+      <button class="info-btn" data-cat="tracking">i</button>
+    </div>
+
+    <div class="toggle-divider"></div>
+
+    <!-- Row: Third-Party Cookies -->
+    <div class="toggle-row" data-cat="third-party">
+      <label class="cookie-toggle" data-flavor="redvelvet">
+        <input type="checkbox" id="tog-thirdparty">
+        <div class="cookie-track">
+          <div class="cookie-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
+        </div>
+      </label>
+      <span class="toggle-label">Third-Party Cookies</span>
+      <button class="info-btn" data-cat="third-party">i</button>
+    </div>
+
+    <!-- Cookie count bar -->
+    <div id="countBar" style="display:flex;gap:8px;justify-content:center;margin-top:14px;padding-top:10px;border-top:1px dashed rgba(150,100,50,0.25);position:relative;z-index:1">
+      <span id="siteLabel" style="font-size:11px;color:#8C6B4A;font-family:'Inter',sans-serif;text-align:center"></span>
+    </div>
+
+  </div><!-- .widget-body -->
+
+  <!-- ══ Info popover ══ -->
+  <div class="info-popover" id="infoPopover">
+    <div class="info-popover-title" id="infoTitle"></div>
+    <button class="info-popover-close" id="infoClose">✕</button>
+    <div id="infoBody"></div>
+  </div>
+
+  <!-- ══ Settings modal ══ -->
+  <div class="settings-overlay" id="settingsOverlay">
+    <div class="settings-inner">
+      <div class="settings-title">Settings</div>
+      <div class="settings-subtitle">Set Your Cookie Preferences</div>
+
+      <!-- Basic 2-column grid -->
+      <div class="settings-grid" id="settingsBasicGrid">
+        <!-- Session -->
+        <div class="settings-row">
+          <label class="settings-toggle" data-flavor="choc">
+            <input type="checkbox" data-cat="session" checked>
+            <div class="settings-track">
+              <div class="settings-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="settings-row-label">Session Cookies</span>
+        </div>
+        <!-- Tracking -->
+        <div class="settings-row">
+          <label class="settings-toggle" data-flavor="mm">
+            <input type="checkbox" data-cat="tracking">
+            <div class="settings-track">
+              <div class="settings-thumb"><img src="../icons/cookie-mm.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="settings-row-label">Tracking Cookies</span>
+        </div>
+        <!-- Auth -->
+        <div class="settings-row">
+          <label class="settings-toggle" data-flavor="matcha">
+            <input type="checkbox" data-cat="authentication" checked>
+            <div class="settings-track">
+              <div class="settings-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="settings-row-label">Authentication Cookies</span>
+        </div>
+        <!-- Third-party -->
+        <div class="settings-row">
+          <label class="settings-toggle" data-flavor="redvelvet">
+            <input type="checkbox" data-cat="third-party">
+            <div class="settings-track">
+              <div class="settings-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
+            </div>
+          </label>
+          <span class="settings-row-label">Third-Party Cookies</span>
+        </div>
+      </div>
+
+      <!-- Advanced Settings collapsible -->
+      <button class="advanced-toggle-btn" id="advancedToggleBtn">
+        Advanced Settings <span class="chevron">▲</span>
+      </button>
+      <div class="advanced-section" id="advancedSection">
+        <div class="settings-grid" style="margin-top:10px">
+          <!-- Analytics -->
+          <div class="settings-row">
+            <label class="settings-toggle" data-flavor="matcha">
+              <input type="checkbox" data-cat="analytics">
+              <div class="settings-track">
+                <div class="settings-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
+              </div>
+            </label>
+            <span class="settings-row-label">Analytics Cookies</span>
+          </div>
+          <!-- Advertising -->
+          <div class="settings-row">
+            <label class="settings-toggle" data-flavor="redvelvet">
+              <input type="checkbox" data-cat="advertising">
+              <div class="settings-track">
+                <div class="settings-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
+              </div>
+            </label>
+            <span class="settings-row-label">Advertising Cookies</span>
+          </div>
+          <!-- Functional -->
+          <div class="settings-row">
+            <label class="settings-toggle" data-flavor="matcha">
+              <input type="checkbox" data-cat="functional" checked>
+              <div class="settings-track">
+                <div class="settings-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
+              </div>
+            </label>
+            <span class="settings-row-label">Functional Cookies</span>
+          </div>
+          <!-- Unknown -->
+          <div class="settings-row">
+            <label class="settings-toggle" data-flavor="choc">
+              <input type="checkbox" data-cat="unknown">
+              <div class="settings-track">
+                <div class="settings-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
+              </div>
+            </label>
+            <span class="settings-row-label">Unknown Cookies</span>
+          </div>
+        </div>
+      </div>
+    </div><!-- .settings-inner -->
+
+    <div class="settings-footer">
+      <button class="btn btn-cancel" id="btnSettingsCancel">Cancel</button>
+      <button class="btn btn-save"   id="btnSettingsSave">Save</button>
+    </div>
+  </div><!-- .settings-overlay -->
+
+</div><!-- .widget -->
+
+<div class="toast" id="toast"></div>
+
+<script src="../utils/cookie-classifier.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

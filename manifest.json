@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Cookie Jar",
+  "version": "1.0.0",
+  "description": "Understand and control the cookies websites place in your browser. Organized by type — necessary, session, tracking, and more.",
+  "permissions": [
+    "cookies",
+    "activeTab",
+    "storage",
+    "tabs",
+    "sidePanel"
+  ],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Cookie Jar"
+  },
+  "side_panel": {
+    "default_path": "popup/popup.html"
+  },
+  "options_page": "options/options.html",
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["icons/*", "styles/*", "fullpage/*", "utils/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+/* Cookie Jar — shared design tokens & components */
+/* Brand: Fredoka font, warm bakery palette extracted from Figma */
+
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Core palette — from Figma brand guidelines frame */
+  --c-primary:     #8B5A2B;   /* Baked Cookie */
+  --c-primary-dk:  #6B4420;
+  --c-primary-lt:  #A87240;
+  --c-bg:          #FFFBF5;   /* Flour/Milk */
+  --c-bg-alt:      #FAF7F2;
+  --c-fg:          #4A3018;   /* Dark Chocolate */
+  --c-secondary:   #F3E5D8;   /* Light Dough */
+  --c-accent:      #E6CFA1;   /* Golden Brown */
+  --c-border:      #E6D5C3;
+  --c-muted:       #8C6B4A;
+  --c-teal:        #518391;
+
+  /* Category colors */
+  --cat-necessary:     #4A7C4E;
+  --cat-session:       #2E6B99;
+  --cat-auth:          #6B3FA0;
+  --cat-tracking:      #C0392B;
+  --cat-advertising:   #E74C3C;
+  --cat-analytics:     #D35400;
+  --cat-functional:    #16A085;
+  --cat-thirdparty:    #E67E22;
+  --cat-unknown:       #7F8C8D;
+
+  /* Toggle */
+  --toggle-on: linear-gradient(135deg, #C4952A 0%, #E6CFA1 100%);
+  --toggle-off: #E6D5C3;
+
+  /* Typography */
+  --font-ui:   'Fredoka', 'Trebuchet MS', sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* Spacing */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px;
+  --sp-4: 16px; --sp-5: 20px; --sp-6: 24px;
+  --sp-8: 32px; --sp-12: 48px;
+
+  /* Radii */
+  --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+  --r-xl: 20px; --r-pill: 9999px;
+
+  /* Shadows */
+  --sh-sm:    0 1px 3px rgba(0,0,0,.10);
+  --sh-md:    0 4px 16px rgba(139,90,43,.12);
+  --sh-lg:    0 8px 32px rgba(139,90,43,.16);
+  --sh-glass: inset 0 1px 0 rgba(255,255,255,.65), inset 0 -1px 0 rgba(139,90,43,.05);
+}
+
+html, body {
+  font-family: var(--font-ui);
+  background: var(--c-bg);
+  color: var(--c-fg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Toggle Switch ── */
+.toggle {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--toggle-off);
+  border-radius: var(--r-pill);
+  border: 1.5px solid rgba(139,90,43,.12);
+  transition: background .25s;
+  cursor: pointer;
+}
+.toggle-track::before {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  left: 2px; top: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.20);
+}
+.toggle input:checked  ~ .toggle-track               { background: var(--toggle-on); border-color: transparent; }
+.toggle input:checked  ~ .toggle-track::before        { transform: translateX(22px); }
+.toggle input:disabled ~ .toggle-track                { opacity: .45; cursor: not-allowed; }
+.toggle input:focus-visible ~ .toggle-track           { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+
+/* ── Buttons ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: var(--sp-2);
+  padding: 10px var(--sp-4);
+  border-radius: var(--r-md);
+  font-family: var(--font-ui);
+  font-size: 15px; font-weight: 500;
+  cursor: pointer; border: none;
+  transition: opacity .15s, transform .1s;
+  text-decoration: none; white-space: nowrap;
+}
+.btn:active  { transform: scale(.97); }
+.btn:hover   { opacity: .88; }
+.btn-primary { background: var(--c-primary); color: #fff; box-shadow: var(--sh-sm); }
+.btn-secondary { background: var(--c-secondary); color: var(--c-fg); }
+.btn-outline { background: transparent; border: 1.5px solid var(--c-border); color: var(--c-fg); }
+.btn-ghost   { background: transparent; color: var(--c-muted); }
+.btn-danger  { background: #FDECEA; color: #C0392B; }
+.btn-sm      { padding: 6px var(--sp-3); font-size: 13px; border-radius: var(--r-sm); }
+.btn-full    { width: 100%; }
+
+/* ── Cards ── */
+.card {
+  background: #fff;
+  border: 1.5px solid var(--c-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm);
+}
+.glass-card {
+  background: rgba(255,251,245,.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid rgba(230,213,195,.75);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-glass), var(--sh-md);
+}
+
+/* ── Badge ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--r-pill);
+  font-size: 11px; font-weight: 600;
+  background: var(--c-secondary);
+  color: var(--c-fg);
+}
+
+/* ── Utilities ── */
+.hidden   { display: none !important; }
+.sr-only  { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.text-muted { color: var(--c-muted); }
+.text-center { text-align: center; }

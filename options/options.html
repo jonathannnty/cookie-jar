@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cookie Jar — Settings</title>
+  <link rel="stylesheet" href="../styles/common.css">
+  <style>
+    html, body { min-height: 100vh; }
+
+    .page {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* Header */
+    .page-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1.5px solid var(--c-border);
+    }
+    .page-header svg { width: 48px; height: 48px; flex-shrink: 0; }
+    .page-header h1 { font-size: 36px; font-weight: 700; color: var(--c-fg); line-height: 1; }
+    .page-header p  { font-size: 15px; color: var(--c-muted); font-family: var(--font-body); margin-top: 4px; }
+
+    /* Sections */
+    .section { margin-bottom: 36px; }
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--c-fg);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--c-border);
+    }
+    .section-title .section-icon {
+      width: 28px; height: 28px;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      background: var(--c-secondary);
+    }
+
+    /* Mode selector */
+    .mode-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .mode-card {
+      padding: 20px;
+      border-radius: var(--r-lg);
+      border: 2px solid var(--c-border);
+      cursor: pointer;
+      transition: border-color .18s, box-shadow .18s;
+      background: white;
+    }
+    .mode-card.selected {
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px rgba(139,90,43,.1);
+    }
+    .mode-card-icon { font-size: 24px; margin-bottom: 8px; }
+    .mode-card-name { font-size: 16px; font-weight: 600; color: var(--c-fg); margin-bottom: 4px; }
+    .mode-card-desc { font-size: 13px; color: var(--c-muted); font-family: var(--font-body); line-height: 1.5; }
+
+    /* Pref rows */
+    .pref-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sp-4);
+      padding: 16px;
+      border-radius: var(--r-md);
+      background: white;
+      border: 1.5px solid var(--c-border);
+      margin-bottom: 8px;
+      transition: border-color .15s;
+    }
+    .pref-row:hover { border-color: var(--c-accent); }
+    .pref-row-info  { display: flex; align-items: center; gap: 14px; flex: 1; }
+    .pref-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .pref-name { font-size: 15px; font-weight: 600; color: var(--c-fg); }
+    .pref-desc { font-size: 13px; color: var(--c-muted); font-family: var(--font-body); margin-top: 2px; }
+    .pref-lookout {
+      font-size: 12px;
+      color: var(--c-primary);
+      font-family: var(--font-body);
+      margin-top: 4px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--r-pill);
+      font-size: 11px; font-weight: 600;
+      margin-top: 3px;
+    }
+    .tag-required  { background: #EBF5EC; color: #4A7C4E; }
+    .tag-optional  { background: #FDECEA; color: #C0392B; }
+
+    /* Toggle (full size) */
+    .toggle {
+      position: relative;
+      display: inline-block;
+      width: 52px; height: 28px;
+      flex-shrink: 0;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      background: var(--toggle-off);
+      border-radius: var(--r-pill);
+      border: 1.5px solid rgba(139,90,43,.12);
+      transition: background .22s;
+      cursor: pointer;
+    }
+    .toggle-track::before {
+      content: '';
+      position: absolute;
+      width: 22px; height: 22px;
+      left: 2px; top: 2px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform .22s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle input:checked ~ .toggle-track { background: var(--toggle-on); border-color: transparent; }
+    .toggle input:checked ~ .toggle-track::before { transform: translateX(24px); }
+    .toggle input:disabled ~ .toggle-track { opacity: .45; cursor: not-allowed; }
+
+    /* Save bar */
+    .save-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,251,245,.95);
+      backdrop-filter: blur(8px);
+      border-top: 1.5px solid var(--c-border);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+      z-index: 10;
+    }
+    .save-status { font-size: 13px; color: var(--c-muted); font-family: var(--font-body); }
+
+    /* Global toggle row */
+    .global-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-radius: var(--r-md);
+      background: var(--c-secondary);
+      margin-bottom: 16px;
+    }
+    .global-row-label { font-size: 15px; font-weight: 500; color: var(--c-fg); }
+    .global-row-desc  { font-size: 13px; color: var(--c-muted); font-family: var(--font-body); }
+  </style>
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- Header -->
+    <header class="page-header">
+      <svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="24" y="8" width="80" height="18" rx="9" fill="#C4952A"/>
+        <rect x="28" y="6" width="72" height="8" rx="4" fill="#E6CFA1"/>
+        <rect x="32" y="24" width="64" height="14" fill="#FAF7F2" stroke="#E6D5C3" stroke-width="2"/>
+        <path d="M18 38 C14 60 12 80 12 96 C12 112 36 122 64 122 C92 122 116 112 116 96 C116 80 114 60 110 38 Z" fill="rgba(255,251,245,0.95)" stroke="#E6D5C3" stroke-width="2.5"/>
+        <circle cx="64" cy="78" r="22" fill="#C4952A" stroke="#A87240" stroke-width="1.5"/>
+        <circle cx="57" cy="72" r="3" fill="#4A3018"/>
+        <circle cx="70" cy="82" r="3" fill="#4A3018"/>
+        <circle cx="63" cy="85" r="2.5" fill="#4A3018"/>
+        <circle cx="72" cy="71" r="2.5" fill="#4A3018"/>
+      </svg>
+      <div>
+        <h1>Cookie Jar</h1>
+        <p>Manage your default cookie preferences for every website you visit.</p>
+      </div>
+    </header>
+
+    <!-- Automation -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="section-icon">⚡</span>
+        Automation
+      </h2>
+      <div class="global-row">
+        <div>
+          <div class="global-row-label">Auto-apply preferences</div>
+          <div class="global-row-desc">Automatically block or delete cookies that don't match your preferences on every page load.</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoApply" checked>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- View mode -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="section-icon">👁️</span>
+        Default view mode
+      </h2>
+      <div class="mode-group">
+        <div class="mode-card selected" id="modeSimpleCard" data-mode="simple">
+          <div class="mode-card-icon">🍪</div>
+          <div class="mode-card-name">Simple</div>
+          <div class="mode-card-desc">One toggle for Necessary and one for Optional. Great for most users.</div>
+        </div>
+        <div class="mode-card" id="modeAdvancedCard" data-mode="advanced">
+          <div class="mode-card-icon">🔬</div>
+          <div class="mode-card-name">Advanced</div>
+          <div class="mode-card-desc">Individual toggles per category: tracking, analytics, advertising, and more.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Simple mode prefs -->
+    <section class="section" id="sectionSimple">
+      <h2 class="section-title">
+        <span class="section-icon">🔒</span>
+        Simple preferences
+      </h2>
+
+      <div class="pref-row">
+        <div class="pref-row-info">
+          <div class="pref-icon" style="background:#EBF5EC">🔒</div>
+          <div>
+            <div class="pref-name">Necessary Cookies</div>
+            <div class="pref-desc">Login, session, security, core functionality. Always required.</div>
+            <span class="tag tag-required">Always on</span>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" checked disabled>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <div class="pref-row">
+        <div class="pref-row-info">
+          <div class="pref-icon" style="background:#FDECEA">⚙️</div>
+          <div>
+            <div class="pref-name">Optional Cookies</div>
+            <div class="pref-desc">Analytics, tracking, advertising, functional preferences.</div>
+            <div class="pref-lookout">Turn off to block cross-site tracking and ad profiling.</div>
+          </div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="simpleOptional">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Advanced mode prefs -->
+    <section class="section hidden" id="sectionAdvanced">
+      <h2 class="section-title">
+        <span class="section-icon">🔬</span>
+        Advanced preferences
+      </h2>
+      <div id="advancedRows"></div>
+    </section>
+
+  </div><!-- .page -->
+
+  <!-- Save bar -->
+  <div class="save-bar">
+    <span class="save-status" id="saveStatus"></span>
+    <button class="btn btn-outline" id="btnReset">Reset to defaults</button>
+    <button class="btn btn-primary" id="btnSave">Save preferences</button>
+  </div>
+
+  <script src="../utils/cookie-classifier.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>
