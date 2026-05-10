@@ -67,16 +67,20 @@ async function loadPrefs() {
 
 // ── Apply prefs to main toggles ────────────────────────
 function syncMainToggles() {
-  const cats = currentPrefs.categories;
-  const map = {
-    'tog-session':    cats.session    !== false,
-    'tog-auth':       cats.authentication !== false,
-    'tog-tracking':   cats.tracking   !== false,
-    'tog-thirdparty': cats['third-party'] !== false,
-  };
-  for (const [id, val] of Object.entries(map)) {
+  const mode = currentPrefs.mode;
+
+  for (const [id, cat] of Object.entries(TOGGLE_CATS)) {
     const el = document.getElementById(id);
-    if (el) el.checked = val;
+    if (!el) continue;
+
+    if (mode === 'simple') {
+      const isNecessary = CookieClassifier.isNecessaryCategory(cat);
+      el.checked = isNecessary
+        ? currentPrefs.simple.necessary !== false
+        : currentPrefs.simple.optional === true;
+    } else {
+      el.checked = currentPrefs.categories[cat] !== false;
+    }
   }
 }
 
@@ -115,7 +119,22 @@ Object.keys(TOGGLE_CATS).forEach(id => {
   if (!el) return;
   el.addEventListener('change', async () => {
     const cat = TOGGLE_CATS[id];
-    currentPrefs.categories[cat] = el.checked;
+    const isOptional = !CookieClassifier.isNecessaryCategory(cat);
+
+    if (currentPrefs.mode === 'simple' && isOptional) {
+      currentPrefs.simple.optional = el.checked;
+      // Keep the other optional toggle in sync visually
+      for (const [otherId, otherCat] of Object.entries(TOGGLE_CATS)) {
+        if (otherId !== id && !CookieClassifier.isNecessaryCategory(otherCat)) {
+          const other = document.getElementById(otherId);
+          if (other) other.checked = el.checked;
+        }
+      }
+    } else if (currentPrefs.mode !== 'simple') {
+      currentPrefs.categories[cat] = el.checked;
+    }
+    // In simple mode, necessary toggles are informational — no state change needed.
+
     await chrome.storage.local.set({ preferences: currentPrefs });
     if (currentTab?.url) await bg({ type: 'APPLY_PREFS', url: currentTab.url });
     toast(el.checked ? `${COOKIE_INFO[cat]?.title || cat} allowed` : `${COOKIE_INFO[cat]?.title || cat} blocked`);
