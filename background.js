@@ -88,6 +88,32 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
+chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
+  if (removed) return;
+  if (cause === 'expired' || cause === 'expired_overwrite' || cause === 'evicted') return;
+
+  try {
+    const prefs = await getPrefs();
+    if (!prefs.autoApply) return;
+
+    const domain = cookie.domain.replace(/^\./, '');
+    const classification = CookieClassifier.classifyCookie(cookie, domain);
+    const { category } = classification;
+
+    let allowed;
+    if (prefs.mode === 'simple') {
+      const needed = CookieClassifier.isNecessaryCategory(category);
+      allowed = needed ? prefs.simple.necessary : prefs.simple.optional;
+    } else {
+      allowed = prefs.categories[category] !== false;
+    }
+
+    if (!allowed) await removeCookie(cookie);
+  } catch {
+    // best-effort — ignore errors
+  }
+});
+
 chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
   switch (msg.type) {
     case 'GET_COOKIES':
