@@ -113,6 +113,7 @@ const CookieClassifier = (() => {
       /^_fbp$/, /^_fbc$/, /^fr$/, /^datr$/, /^sb$/, /^c_user$/, /^xs$/, /^wd$/,
       /^MUID$/, /^MUIDB$/, /^WT_FPC$/, /^MC1$/,
       /^_clck$/, /^_clsk$/,
+      /^_hjIncluded/, /^_hjFirstSeen/, /^_hjAbsoluteSession/,
       /^_tt_enable_cookie$/,
       /^ajs_/,
       /^intercom[-_]/, /^_intercom/,
