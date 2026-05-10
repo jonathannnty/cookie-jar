@@ -47,7 +47,8 @@ async function getClassifiedCookies(url) {
 async function removeCookie(cookie) {
   const scheme = cookie.secure ? 'https' : 'http';
   const domain = cookie.domain.startsWith('.') ? cookie.domain.slice(1) : cookie.domain;
-  return chrome.cookies.remove({ url: `${scheme}://${domain}${cookie.path}`, name: cookie.name });
+  const result = await chrome.cookies.remove({ url: `${scheme}://${domain}${cookie.path}`, name: cookie.name });
+  return result !== null;
 }
 
 async function applyPreferences(url) {
@@ -68,7 +69,12 @@ async function applyPreferences(url) {
         allowed = prefs.categories[category] !== false;
       }
 
-      if (!allowed) await removeCookie(cookie);
+      if (!allowed) {
+        const removed = await removeCookie(cookie);
+        if (!removed) {
+          console.warn(`[Cookie Jar] Failed to remove "${cookie.name}" on ${cookie.domain} — check domain/path match`);
+        }
+      }
     }
   } catch {
     // silently skip non-http URLs or permission errors
@@ -121,14 +127,17 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
       return true;
 
     case 'DELETE_COOKIE':
-      removeCookie(msg.cookie).then(() => reply({ ok: true }));
+      removeCookie(msg.cookie).then(ok => reply({ ok }));
       return true;
 
     case 'DELETE_CATEGORY':
       getClassifiedCookies(msg.url).then(async cookies => {
         const targets = cookies.filter(c => c.classification.category === msg.category);
-        for (const c of targets) await removeCookie(c);
-        reply({ count: targets.length });
+        let removed = 0;
+        for (const c of targets) {
+          if (await removeCookie(c)) removed++;
+        }
+        reply({ count: targets.length, removed });
       });
       return true;
 
