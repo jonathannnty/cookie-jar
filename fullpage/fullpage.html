@@ -7,9 +7,11 @@
   <link rel="stylesheet" href="../styles/common.css">
   <style>
     html, body {
-      min-height: 100vh;
+      height: 100%;
+      overflow: hidden;
       background: #FFF8EE;
-      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── Top bar ── */
@@ -20,6 +22,7 @@
       padding: 14px 32px;
       background: #FFF8EE;
       border-bottom: 1.5px solid #665747;
+      flex-shrink: 0;
     }
     .topbar-left { display: flex; align-items: center; gap: 10px; }
     .topbar-icon { height: 44px; width: auto; display: block; }
@@ -41,13 +44,15 @@
     .main {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      min-height: calc(100vh - 66px);
+      flex: 1;
+      overflow: hidden;
     }
 
-    /* ── Left panel ── */
+    /* ── Left panel (scrollable) ── */
     .left-panel {
       padding: 40px 48px;
       border-right: 1.5px solid rgba(102,87,71,0.35);
+      overflow-y: auto;
     }
     .left-headline {
       font-size: 36px; font-weight: 700;
@@ -68,8 +73,17 @@
       margin-bottom: 28px;
       padding: 20px;
       background: #fff;
-      border: 1.5px solid rgba(102,87,71,0.3);
       border-radius: 16px;
+      position: relative;
+    }
+    .cookie-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid rgba(102,87,71,0.5);
+      border-radius: 16px;
+      pointer-events: none;
+      filter: url('#hd');
     }
     .cookie-section-header {
       display: flex;
@@ -88,24 +102,33 @@
       position: absolute; inset: 0;
       border-radius: 15px;
       background: #EDE0C8;
-      border: 1.5px solid rgba(139,90,43,.2);
       transition: background 0.25s;
       overflow: hidden;
     }
     .cs-thumb {
       position: absolute;
       width: 28px; height: 28px;
-      top: -0.5px; left: -0.5px;
+      top: 50%; left: 1px;
+      transform: translateY(-50%);
       transition: transform 0.25s cubic-bezier(.34,1.2,.64,1);
       filter: drop-shadow(0 1px 2px rgba(0,0,0,.2));
     }
     .cs-thumb img { width: 100%; height: 100%; border-radius: 50%; }
-    .cookie-section-toggle input:checked ~ .cs-track { background: #8B5A2B; border-color: #6B4220; }
-    .cookie-section-toggle[data-flavor="matcha"] input:checked ~ .cs-track { background: #5E8C3C; }
-    .cookie-section-toggle[data-flavor="mm"] input:checked ~ .cs-track { background: #8B5A2B; }
-    .cookie-section-toggle[data-flavor="redvelvet"] input:checked ~ .cs-track { background: #B05050; }
-    .cookie-section-toggle input:checked ~ .cs-track .cs-thumb { transform: translateX(26px); }
-
+    .cookie-section-toggle input:checked ~ .cs-track { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
+    .cookie-section-toggle[data-flavor="matcha"] input:checked ~ .cs-track { background: linear-gradient(135deg, #78AA3A 0%, #3A6018 100%); }
+    .cookie-section-toggle[data-flavor="mm"] input:checked ~ .cs-track { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
+    .cookie-section-toggle[data-flavor="redvelvet"] input:checked ~ .cs-track { background: linear-gradient(135deg, #C86060 0%, #7A2828 100%); }
+    .cookie-section-toggle input:checked ~ .cs-track .cs-thumb { transform: translateX(26px) translateY(-50%); }
+    .cookie-section-toggle::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid #665747;
+      border-radius: 15px;
+      pointer-events: none;
+      filter: url('#hd');
+      z-index: 3;
+    }
     .cookie-section-name {
       font-size: 18px; font-weight: 600;
       color: #4A3018;
@@ -123,35 +146,67 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      overflow-y: auto;
     }
     .right-title {
       font-size: 28px; font-weight: 700;
       color: #4A3018;
       font-family: 'Fredoka', sans-serif;
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
+      flex-shrink: 0;
     }
 
-    /* Big cookie jar illustration */
-    .jar-illustration {
-      width: 200px;
-      height: 260px;
+    /* ── Milk cup illustration ── */
+    .milk-container {
       position: relative;
-      margin-bottom: 32px;
+      width: 180px;
+      height: 270px; /* 180 * (672/450) */
+      margin: 0 auto 28px;
+      flex-shrink: 0;
+    }
+    /* milk fill overlay sits behind the glass image */
+    .milk-overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      overflow: visible;
+    }
+    .milk-cup-img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 1;
+      display: block;
+    }
+    #milk-fill-rect {
+      transition: transform 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
     }
 
+    /* ── Safe/Unsafe cards ── */
     .safe-unsafe {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
       width: 100%;
       max-width: 420px;
+      flex-shrink: 0;
     }
     .safety-card {
       background: #fff;
-      border: 1.5px solid rgba(102,87,71,0.3);
       border-radius: 16px;
       padding: 20px;
+      position: relative;
+    }
+    .safety-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border: 1.5px solid rgba(102,87,71,0.45);
+      border-radius: 16px;
+      pointer-events: none;
+      filter: url('#hd');
     }
     .safety-card-header {
       display: flex;
@@ -159,14 +214,12 @@
       gap: 10px;
       margin-bottom: 12px;
     }
-    .safety-icon {
-      width: 40px; height: 40px;
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
+    .safety-icon-img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      flex-shrink: 0;
     }
-    .safety-icon.safe     { background: #EBF5EC; }
-    .safety-icon.unsafe   { background: #FDECEA; }
     .safety-card-title {
       font-size: 16px; font-weight: 600;
       color: #4A3018;
@@ -174,6 +227,7 @@
     }
     .safety-card-list {
       list-style: none;
+      padding: 0; margin: 0;
     }
     .safety-card-list li {
       font-family: 'Inter', sans-serif;
@@ -188,8 +242,9 @@
 
     /* Settings shortcut */
     .settings-shortcut {
-      margin-top: 32px;
+      margin-top: 24px;
       text-align: center;
+      flex-shrink: 0;
     }
     .settings-shortcut p {
       font-family: 'Inter', sans-serif;
@@ -199,6 +254,16 @@
   </style>
 </head>
 <body>
+
+<!-- Hand-drawn border filter -->
+<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+  <defs>
+    <filter id="hd" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="6" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
 
   <!-- Top bar -->
   <header class="topbar">
@@ -212,12 +277,15 @@
   <!-- Main two-column layout -->
   <main class="main">
 
-    <!-- Left: Tailor your cookies -->
+    <!-- Left: Tailor your cookies (scrollable) -->
     <div class="left-panel">
       <h1 class="left-headline">Tailor your cookies!</h1>
       <p class="left-intro">
-        Cookies are small bits of data stored in your browser that help websites remember things like your login, preferences, and settings to provide a smoother browsing experience.<br><br>
-        But not all cookies are created equally — some are used to track your activity across websites and sell that information to advertisers.
+        Cookies are small bits of data stored in your browser that help websites remember things
+        like your login, preferences, and settings to provide a smoother browsing experience.<br><br>
+        But not all cookies are created equally — some are used to track your activity across
+        websites and sell that information to advertisers. With Cookie Jar, you can choose between
+        necessary and optional cookies to protect your privacy — without breaking your browsing.
       </p>
 
       <!-- Session Cookies -->
@@ -232,7 +300,8 @@
           <span class="cookie-section-name">Session Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.
+          Session cookies are temporary cookies that help websites remember you while you use them —
+          like keeping you logged in or saving your cart. They disappear once you close your browser.
         </p>
       </div>
 
@@ -248,7 +317,9 @@
           <span class="cookie-section-name">Authentication Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Authentication cookies keep you signed in to websites even as you navigate between pages. Without them you'd need to re-enter your password on every click. If stolen, attackers can log into your accounts without your password.
+          Authentication cookies keep you signed in to websites even as you navigate between pages.
+          Without them you'd need to re-enter your password on every click. If stolen, attackers
+          can log into your accounts without your password.
         </p>
       </div>
 
@@ -264,7 +335,9 @@
           <span class="cookie-section-name">Tracking Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Tracking cookies follow your activity across websites to build detailed profiles about you. In 2025, 93.7 billion stolen tracking cookies were found on the dark web — linked to Google, YouTube, and other major platforms.
+          Tracking cookies follow your activity across websites to build detailed profiles about you.
+          In 2025, 93.7 billion stolen tracking cookies were found on the dark web — linked to
+          Google, YouTube, and other major platforms.
         </p>
       </div>
 
@@ -280,7 +353,9 @@
           <span class="cookie-section-name">Third-Party Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Third-party cookies are set by a domain different from the site you're on — embedded social buttons, videos, or ad networks. They can track your browsing across many sites simultaneously.
+          Third-party cookies are set by a domain different from the site you're on — embedded
+          social buttons, videos, or ad networks. They can track your browsing across many sites
+          simultaneously.
         </p>
       </div>
 
@@ -296,7 +371,9 @@
           <span class="cookie-section-name">Analytics Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Analytics cookies measure how visitors use a website — which pages are popular, where people drop off, and how long they spend. Less intrusive than tracking, though aggregate data can still identify individuals.
+          Analytics cookies measure how visitors use a website — which pages are popular, where
+          people drop off, and how long they spend. Less intrusive than tracking, though aggregate
+          data can still identify individuals.
         </p>
       </div>
 
@@ -312,7 +389,8 @@
           <span class="cookie-section-name">Advertising Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Advertising cookies deliver targeted ads based on your browsing history and measure ad conversions. They are often shared across hundreds of advertising networks.
+          Advertising cookies deliver targeted ads based on your browsing history and measure
+          ad conversions. They are often shared across hundreds of advertising networks.
         </p>
       </div>
 
@@ -328,7 +406,9 @@
           <span class="cookie-section-name">Functional Cookies</span>
         </div>
         <p class="cookie-section-body">
-          Functional cookies save your preferences — like language, theme, or font size — so you don't reset them every visit. Generally low-risk, though they can persist as a long-lived fingerprint.
+          Functional cookies save your preferences — like language, theme, or font size — so you
+          don't reset them every visit. Generally low-risk, though they can persist as a long-lived
+          fingerprint.
         </p>
       </div>
 
@@ -344,58 +424,56 @@
           <span class="cookie-section-name">Unknown Cookies</span>
         </div>
         <p class="cookie-section-body">
-          These cookies don't match any known pattern — could be custom app cookies, proprietary tracking, or site-specific data. When uncertain, consider blocking them from sites you don't fully trust.
+          These cookies don't match any known pattern — could be custom app cookies, proprietary
+          tracking, or site-specific data. When uncertain, consider blocking them from sites you
+          don't fully trust.
         </p>
       </div>
 
       <!-- Save button -->
-      <button class="btn btn-primary" id="saveFullPage" style="width:100%;margin-top:8px;padding:14px;font-size:16px;border-radius:14px">
+      <button class="btn btn-primary" id="saveFullPage"
+              style="width:100%;margin-top:8px;padding:14px;font-size:16px;border-radius:14px">
         Save preferences
       </button>
     </div>
 
-    <!-- Right: Safe vs Unsafe -->
+    <!-- Right: Safe vs Unsafe Cookies -->
     <div class="right-panel">
       <h2 class="right-title">Safe vs. Unsafe Cookies</h2>
 
-      <!-- Big cookie jar illustration -->
-      <div class="jar-illustration">
-        <svg viewBox="0 0 200 260" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
-          <!-- Lid -->
-          <rect x="40" y="8" width="120" height="24" rx="12" fill="#C4952A"/>
-          <rect x="44" y="4" width="112" height="14" rx="7" fill="#E6CFA1"/>
-          <!-- Neck -->
-          <rect x="52" y="30" width="96" height="20" fill="#FFF8EE" stroke="#E6D5C3" stroke-width="2"/>
-          <!-- Body -->
-          <path d="M24 50 C20 80 18 110 18 140 C18 190 50 210 100 210 C150 210 182 190 182 140 C182 110 180 80 176 50 Z" fill="#FFF8EE" stroke="#E6D5C3" stroke-width="2"/>
-          <!-- Glass shine -->
-          <path d="M30 55 C28 80 27 105 28 135" stroke="rgba(255,255,255,0.7)" stroke-width="5" stroke-linecap="round"/>
-          <!-- Dashed label outline -->
-          <path d="M35 90 C30 110 28 130 30 155 C32 175 50 185 100 185 C150 185 168 175 170 155 C172 130 170 110 165 90 Z" stroke="rgba(196,168,112,0.5)" stroke-width="2" stroke-dasharray="6 4" fill="none"/>
-          <!-- Safe cookies (green) -->
-          <circle cx="80" cy="115" r="22" fill="#7BAF58" stroke="#4E7E35" stroke-width="1.5"/>
-          <circle cx="72" cy="108" r="3.5" fill="#F2EDD4"/>
-          <circle cx="85" cy="112" r="3" fill="#F2EDD4"/>
-          <circle cx="74" cy="120" r="3" fill="#F2EDD4"/>
-          <!-- Safe label -->
-          <text x="80" y="148" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="10" fill="#4A7C4E">Session</text>
-          <!-- Tracking cookie (M&M) -->
-          <circle cx="130" cy="130" r="20" fill="#D4A843" stroke="#9B7322" stroke-width="1.5"/>
-          <circle cx="122" cy="123" r="3" fill="#E74C3C"/>
-          <circle cx="134" cy="124" r="3" fill="#3498DB"/>
-          <circle cx="122" cy="133" r="3" fill="#F1C40F"/>
-          <circle cx="135" cy="134" r="2.5" fill="#27AE60"/>
-          <!-- Warning mark on tracking cookie -->
-          <circle cx="145" cy="113" r="10" fill="#E74C3C"/>
-          <text x="145" y="117" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="white">!</text>
+      <!--
+        Milk cup with dynamic fill level.
+        The milk-overlay SVG sits behind the MilkCup image (z-index 0 vs 1).
+        The glass path in MilkCup.svg has fill-opacity 0.48, so the amber
+        milk fill shows through the semi-transparent glass.
+        milk-fill-rect is translated downward by (1 - fillPct) * glassHeight
+        so it rises from the bottom as more categories are enabled.
+      -->
+      <div class="milk-container">
+        <svg class="milk-overlay" viewBox="0 0 450 672"
+             preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+          <defs>
+            <clipPath id="glass-clip">
+              <path d="M3.04589 36.9196C2.67097 30.9688 2.48351 27.9934 3.71553 24.8778C4.66704 22.4716 6.96972 19.5625 9.09317 18.084C11.8426 16.1696 14.3259 15.7465 19.2924 14.9004C94.7977 2.03687 336.98 -3.97235 430.206 14.5126C435.846 15.6309 438.666 16.1901 441.308 18.0883C443.452 19.6285 445.522 22.2783 446.497 24.7315C447.698 27.7552 447.54 30.9765 447.225 37.4192L418.991 613.579C418.416 625.313 418.129 631.181 415.501 636.649C413.382 641.056 409.231 645.846 405.169 648.57C400.13 651.948 395.08 652.928 384.98 654.887C297.367 671.882 142.179 674.896 67.3797 656.01C60.6565 654.313 57.2949 653.464 52.6407 650.102C49.2474 647.652 44.8637 642.375 43.0768 638.59C40.6258 633.398 40.3328 628.749 39.747 619.45L3.04589 36.9196Z"/>
+            </clipPath>
+          </defs>
+          <!-- starts empty (translateY = 641); JS animates to actual fill level -->
+          <rect id="milk-fill-rect"
+                x="0" y="15" width="450" height="641"
+                fill="#F2E0B0"
+                clip-path="url(#glass-clip)"
+                transform="translate(0, 641)"/>
         </svg>
+        <img class="milk-cup-img"
+             src="../figma/svg/MilkCup.svg"
+             alt="Milk cup — level reflects how many cookie categories you allow">
       </div>
 
-      <!-- Safe vs Unsafe cards -->
+      <!-- Safe vs Unsafe info cards -->
       <div class="safe-unsafe">
         <div class="safety-card safe">
           <div class="safety-card-header">
-            <div class="safety-icon safe">🔒</div>
+            <img class="safety-icon-img" src="../figma/svg/SafeCookie.svg" alt="">
             <div class="safety-card-title">Safe Cookies</div>
           </div>
           <ul class="safety-card-list">
@@ -408,7 +486,7 @@
         </div>
         <div class="safety-card unsafe">
           <div class="safety-card-header">
-            <div class="safety-icon unsafe">⚠️</div>
+            <img class="safety-icon-img" src="../figma/svg/UnsafeCookie.svg" alt="">
             <div class="safety-card-title">Unsafe Cookies</div>
           </div>
           <ul class="safety-card-list">
@@ -423,7 +501,8 @@
 
       <div class="settings-shortcut">
         <p>Want fine-grained control? Open the full settings to manage each cookie type individually.</p>
-        <button class="btn btn-outline" onclick="chrome.runtime.openOptionsPage()" style="font-size:14px;padding:10px 24px;border-radius:12px;border:1.5px solid #E6D5C3;color:#4A3018;background:transparent;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:500">
+        <button class="btn btn-outline" onclick="chrome.runtime.openOptionsPage()"
+                style="font-size:14px;padding:10px 24px;border-radius:12px;border:1.5px solid #E6D5C3;color:#4A3018;background:transparent;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:500">
           Open full settings →
         </button>
       </div>
@@ -436,31 +515,55 @@
   <script>
     'use strict';
 
+    let currentPrefs = null;
+
+    const ALL_CATS = [
+      'session', 'authentication', 'tracking', 'third-party',
+      'analytics', 'advertising', 'functional', 'unknown'
+    ];
+
+    /* top of glass y=15, bottom y=656, height=641 in SVG coords */
+    const GLASS_HEIGHT = 641;
+
+    function updateMilkLevel() {
+      if (!currentPrefs) return;
+      const enabledCount = ALL_CATS.filter(c => currentPrefs.categories[c] !== false).length;
+      const fillPct = enabledCount / ALL_CATS.length;
+      const translateY = GLASS_HEIGHT * (1 - fillPct);
+      const rect = document.getElementById('milk-fill-rect');
+      if (rect) rect.setAttribute('transform', `translate(0, ${translateY})`);
+    }
+
     async function loadAndSync() {
       const data = await chrome.storage.local.get('preferences');
-      const prefs = CookiePrefs.mergePrefs(data.preferences);
+      currentPrefs = CookiePrefs.mergePrefs(data.preferences);
       document.querySelectorAll('[data-cat]').forEach(input => {
         const cat = input.dataset.cat;
-        if (prefs.categories[cat] !== undefined) input.checked = prefs.categories[cat];
+        if (currentPrefs.categories[cat] !== undefined) {
+          input.checked = currentPrefs.categories[cat];
+        }
       });
+      updateMilkLevel();
     }
 
     document.querySelectorAll('[data-cat]').forEach(input => {
       input.addEventListener('change', async () => {
         const data = await chrome.storage.local.get('preferences');
-        const prefs = CookiePrefs.mergePrefs(data.preferences);
-        prefs.categories[input.dataset.cat] = input.checked;
-        await chrome.storage.local.set({ preferences: prefs });
+        currentPrefs = CookiePrefs.mergePrefs(data.preferences);
+        currentPrefs.categories[input.dataset.cat] = input.checked;
+        await chrome.storage.local.set({ preferences: currentPrefs });
+        updateMilkLevel();
       });
     });
 
     document.getElementById('saveFullPage')?.addEventListener('click', async () => {
       const data = await chrome.storage.local.get('preferences');
-      const prefs = CookiePrefs.mergePrefs(data.preferences);
+      currentPrefs = CookiePrefs.mergePrefs(data.preferences);
       document.querySelectorAll('[data-cat]').forEach(input => {
-        prefs.categories[input.dataset.cat] = input.checked;
+        currentPrefs.categories[input.dataset.cat] = input.checked;
       });
-      await chrome.storage.local.set({ preferences: prefs });
+      await chrome.storage.local.set({ preferences: currentPrefs });
+      updateMilkLevel();
 
       const btn = document.getElementById('saveFullPage');
       btn.textContent = 'Saved ✓';
