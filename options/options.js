@@ -1,17 +1,5 @@
 'use strict';
 
-const DEFAULT_PREFS = {
-  mode: 'simple',
-  onboardingComplete: true,
-  autoApply: true,
-  categories: {
-    necessary: true, session: true, authentication: true,
-    tracking: false, advertising: false, analytics: false,
-    functional: true, 'third-party': false, unknown: false,
-  },
-  simple: { necessary: true, optional: false },
-};
-
 const ADVANCED_DEFS = [
   { cat: 'necessary',     icon: '🔒', bg: '#EBF5EC', required: true,  label: 'Necessary',    desc: 'Core site functionality. Cannot be disabled.' },
   { cat: 'session',       icon: '⏱️', bg: '#EBF3FA', required: false, label: 'Session',      desc: 'Temporary cookies deleted when you close your browser.' },
@@ -24,7 +12,7 @@ const ADVANCED_DEFS = [
   { cat: 'unknown',       icon: '❓', bg: '#F2F3F4', required: false, label: 'Unknown',      desc: 'Purpose could not be automatically determined.' },
 ];
 
-let currentPrefs = { ...DEFAULT_PREFS };
+let currentPrefs = { ...CookiePrefs.DEFAULT_PREFS };
 
 function setStatus(msg, timeout = 0) {
   const el = document.getElementById('saveStatus');
@@ -35,10 +23,8 @@ function setStatus(msg, timeout = 0) {
 // ── Load ───────────────────────────────────────────────
 async function load() {
   const data = await chrome.storage.local.get('preferences');
-  currentPrefs = Object.assign({}, DEFAULT_PREFS, data.preferences, {
-    categories: Object.assign({}, DEFAULT_PREFS.categories, data.preferences?.categories),
-    simple: Object.assign({}, DEFAULT_PREFS.simple, data.preferences?.simple),
-  });
+  currentPrefs = CookiePrefs.mergePrefs(data.preferences);
+  currentPrefs.onboardingComplete = true;
 
   document.getElementById('autoApply').checked = currentPrefs.autoApply !== false;
   document.getElementById('simpleOptional').checked = currentPrefs.simple.optional ?? false;
@@ -123,7 +109,7 @@ document.getElementById('btnSave').addEventListener('click', async () => {
 // ── Reset ──────────────────────────────────────────────
 document.getElementById('btnReset').addEventListener('click', async () => {
   if (!confirm('Reset all preferences to defaults?')) return;
-  currentPrefs = { ...DEFAULT_PREFS, onboardingComplete: true };
+  currentPrefs = { ...CookiePrefs.DEFAULT_PREFS, onboardingComplete: true };
   await chrome.storage.local.set({ preferences: currentPrefs });
   load();
   setStatus('Reset to defaults ✓', 2500);

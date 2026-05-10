@@ -62,13 +62,7 @@ function toast(msg) {
 // ── Preferences ────────────────────────────────────────
 async function loadPrefs() {
   const data = await chrome.storage.local.get('preferences');
-  currentPrefs = Object.assign({
-    mode: 'simple', autoApply: true,
-    categories: { session: true, authentication: true, tracking: false, 'third-party': false, analytics: false, advertising: false, functional: true, unknown: false },
-    simple: { necessary: true, optional: false },
-  }, data.preferences, {
-    categories: Object.assign({}, { session: true, authentication: true, tracking: false, 'third-party': false, analytics: false, advertising: false, functional: true, unknown: false }, data.preferences?.categories),
-  });
+  currentPrefs = CookiePrefs.mergePrefs(data.preferences);
 }
 
 // ── Apply prefs to main toggles ────────────────────────

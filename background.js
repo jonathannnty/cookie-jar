@@ -1,34 +1,11 @@
 'use strict';
 
 importScripts('./utils/cookie-classifier.js');
-
-const DEFAULT_PREFS = {
-  mode: 'simple',
-  onboardingComplete: false,
-  autoApply: true,
-  categories: {
-    necessary: true,
-    session: true,
-    authentication: true,
-    tracking: false,
-    advertising: false,
-    analytics: false,
-    functional: true,
-    'third-party': false,
-    unknown: false,
-  },
-  simple: {
-    necessary: true,
-    optional: false,
-  },
-};
+importScripts('./utils/prefs.js');
 
 async function getPrefs() {
   const data = await chrome.storage.local.get('preferences');
-  return Object.assign({}, DEFAULT_PREFS, data.preferences, {
-    categories: Object.assign({}, DEFAULT_PREFS.categories, data.preferences?.categories),
-    simple: Object.assign({}, DEFAULT_PREFS.simple, data.preferences?.simple),
-  });
+  return CookiePrefs.mergePrefs(data.preferences);
 }
 
 async function getClassifiedCookies(url) {
@@ -83,7 +60,7 @@ async function applyPreferences(url) {
 
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
-    await chrome.storage.local.set({ preferences: DEFAULT_PREFS });
+    await chrome.storage.local.set({ preferences: CookiePrefs.DEFAULT_PREFS });
     chrome.tabs.create({ url: chrome.runtime.getURL('onboarding/onboarding.html') });
   }
 });

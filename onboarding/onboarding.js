@@ -64,32 +64,24 @@ btnAdvanced.addEventListener('click', () => setMode('advanced'));
 
 // Build and save preferences
 document.getElementById('saveBtn').addEventListener('click', async () => {
+  const categories = { ...CookiePrefs.DEFAULT_PREFS.categories };
+
+  if (currentMode === 'advanced') {
+    document.querySelectorAll('[data-cat]').forEach(input => {
+      categories[input.dataset.cat] = input.checked;
+    });
+  }
+
   const prefs = {
+    ...CookiePrefs.DEFAULT_PREFS,
     mode: currentMode,
     onboardingComplete: true,
-    autoApply: true,
-    categories: {
-      necessary: true,
-      session: true,
-      authentication: true,
-      tracking: false,
-      advertising: false,
-      analytics: false,
-      functional: true,
-      'third-party': false,
-      unknown: false,
-    },
+    categories,
     simple: {
       necessary: true,
       optional: document.getElementById('simpleOptional')?.checked ?? false,
     },
   };
-
-  if (currentMode === 'advanced') {
-    document.querySelectorAll('[data-cat]').forEach(input => {
-      prefs.categories[input.dataset.cat] = input.checked;
-    });
-  }
 
   await chrome.storage.local.set({ preferences: prefs });
   window.close();
