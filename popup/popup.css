@@ -106,7 +106,8 @@ body {
 /* ── Stitched jar body ── */
 .widget-body {
   position: relative;
-  padding: 14px 16px 18px;
+  background: transparent;
+  padding: 24px 28px 24px;
 }
 /* Inner stitched border (like a label on the jar) */
 .widget-body::before {
