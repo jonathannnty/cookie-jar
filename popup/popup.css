@@ -1,65 +1,61 @@
-/* Cookie Jar — Popup. Matches WidgetPanel.png Figma design exactly. */
+/* Cookie Jar — Popup. Matches Figma WidgetPanel design. */
 
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
   --c-primary:   #8B5A2B;
-  --c-bg:        #FFFBF5;
   --c-fg:        #4A3018;
-  --c-border:    #C4A870;
   --c-muted:     #8C6B4A;
-  --c-header-bg: #C4A870;   /* wooden lid color */
-  --c-body-bg:   #FFF8EE;   /* cream jar body */
-  --c-stitch:    rgba(150, 100, 50, 0.35);
   --font: 'Fredoka', 'Trebuchet MS', sans-serif;
 }
 
-html { width: 320px; }
+html {
+  width: 374px;
+  height: 353px;
+}
 
 body {
   font-family: var(--font);
-  background: var(--c-bg);
+  background: transparent;
   color: var(--c-fg);
-  width: 320px;
+  width: 374px;
+  height: 353px;
+  margin: 0;
+  padding: 0;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
 }
 
-/* ── Outer wrapper ── */
-.widget {
-  position: relative;
-  background: var(--c-body-bg);
-  border: 2.5px solid var(--c-border);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 4px 20px rgba(139,90,43,0.18);
+/* ── Outer shell: no padding, no background — widget fills full window ── */
+.widget-shell {
+  padding: 0;
+  background: transparent;
 }
 
-/* ── Wooden header bar ── */
-.widget-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  background: linear-gradient(to bottom, #D4B47A, #B89050);
-  border-bottom: 2px solid #9B7322;
+/* ── Widget: #BDA07C is the outer brown frame (shows through the transparent
+      areas of CookieJar.svg). CookieJar.svg draws the cream jar body shape
+      on top. No UI content is embedded in either layer. ── */
+.widget {
   position: relative;
+  width: 374px;
+  height: 353px;
+  overflow: hidden;
+  background-color: #BDA07C;
+  background-image: url('../figma/svg/CookieJar.svg');
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  box-shadow: inset -4px -4.5px 10px rgba(53, 41, 28, 0.3);
 }
-/* Wood grain texture overlay */
-.widget-header::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent,
-    transparent 18px,
-    rgba(255,255,255,0.06) 18px,
-    rgba(255,255,255,0.06) 20px
-  );
-  pointer-events: none;
+
+/* ── Header bar (sits in the brown outer frame area of the SVG) ── */
+.widget-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 10px 14px 8px;
+  background: transparent;
+  position: relative;
+  z-index: 2;
 }
 
 .widget-header-left {
@@ -73,24 +69,23 @@ body {
   justify-content: flex-end;
 }
 .header-jar-icon {
-  width: 28px; height: 28px;
+  height: 28px;
+  width: auto;
+  display: block;
 }
 .widget-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
-  color: #4A2800;
+  color: #5b4a38;
   letter-spacing: 0.01em;
   text-shadow: 0 1px 0 rgba(255,255,255,0.3);
   white-space: nowrap;
+  text-align: center;
   pointer-events: none;
-  z-index: 1;
 }
 
 .header-btn {
-  width: 28px; height: 28px;
+  width: 26px; height: 26px;
   border: none; background: transparent;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -101,21 +96,18 @@ body {
   flex-shrink: 0;
 }
 .header-btn:hover { background: rgba(0,0,0,0.1); }
-.header-btn svg { width: 16px; height: 16px; }
+.header-btn img { width: 20px; height: 20px; display: block; }
 
-/* ── Stitched jar body ── */
+/* ── Jar body (sits in the cream inner area of CookieJar.svg) ── */
 .widget-body {
   position: relative;
-  padding: 14px 16px 18px;
+  background: transparent;
+  padding: 28px 28px 24px;
 }
-/* Inner stitched border (like a label on the jar) */
-.widget-body::before {
-  content: '';
-  position: absolute;
-  inset: 6px;
-  border: 1.5px dashed var(--c-stitch);
-  border-radius: 12px;
-  pointer-events: none;
+
+/* ── Toggle list wrapper ── */
+.toggle-list {
+  padding-top: 0;
 }
 
 /* ── Cookie toggle rows ── */
@@ -123,10 +115,10 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 8px;
+  padding: 12px 4px;
   border-radius: 10px;
   cursor: default;
-  transition: background 0.12s;
+  transition: background 0.08s;
   position: relative;
   z-index: 1;
 }
@@ -134,28 +126,25 @@ body {
 
 .toggle-label {
   flex: 1;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
-  color: var(--c-fg);
+  color: #94765d;
+  white-space: nowrap;
 }
 
 /* ── Info button ── */
 .info-btn {
   width: 22px; height: 22px;
-  border-radius: 50%;
   border: none;
-  background: #C4952A;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: var(--font);
+  background: transparent;
+  padding: 0;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  transition: background 0.15s, transform 0.1s;
-  line-height: 1;
+  transition: transform 0.1s, filter 0.15s;
 }
-.info-btn:hover  { background: #A87240; }
+.info-btn img { width: 100%; height: 100%; display: block; }
+.info-btn:hover  { filter: brightness(1.15); }
 .info-btn:active { transform: scale(0.92); }
 
 /* ── Cookie-shaped toggle ── */
@@ -175,35 +164,73 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 18px;
-  background: #EDE0C8;
-  border: 2px solid rgba(139,90,43,0.25);
-  transition: background 0.28s, border-color 0.28s;
+  background: linear-gradient(-90deg, rgb(239, 227, 216) 0%, rgb(230, 200, 171) 100%);
+  overflow: hidden;
+  box-shadow:
+    inset 0 -1px 2px rgba(82, 63, 43, 0.3),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.2),
+    inset 0 5px 5px rgba(121, 98, 62, 0.18),
+    inset 0 5px 5px rgba(255, 255, 255, 0.15);
+}
+/* GPU-composited color overlay — replaces background gradient transition */
+.cookie-track::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  will-change: opacity;
+  pointer-events: none;
+}
+.cookie-toggle[data-flavor="choc"]      .cookie-track::before { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
+.cookie-toggle[data-flavor="choc-dark"] .cookie-track::before { background: linear-gradient(135deg, #7A4820 0%, #3A1808 100%); }
+.cookie-toggle[data-flavor="matcha"]    .cookie-track::before { background: linear-gradient(135deg, #78AA3A 0%, #3A6018 100%); }
+.cookie-toggle[data-flavor="mm"]        .cookie-track::before { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
+.cookie-toggle[data-flavor="redvelvet"] .cookie-track::before { background: linear-gradient(135deg, #C86060 0%, #7A2828 100%); }
+.cookie-toggle input:checked ~ .cookie-track::before { opacity: 1; }
+/* Hand-drawn border overlay on the toggle track */
+.cookie-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #665747;
+  border-radius: 18px;
+  pointer-events: none;
+  filter: url('#hd');
+  z-index: 3;
 }
 /* Cookie thumb image */
 .cookie-thumb {
   position: absolute;
   width: 32px; height: 32px;
-  top: 2px; left: 2px;
+  top: 50%;
+  left: 2px;
+  transform: translateY(-50%);
   border-radius: 50%;
-  transition: transform 0.28s cubic-bezier(0.34, 1.2, 0.64, 1);
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.28));
+  transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.3));
+  will-change: transform;
 }
 .cookie-thumb img {
   width: 100%; height: 100%;
   display: block;
   border-radius: 50%;
+  transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-origin: center;
 }
 
-/* ON state: thumb slides right, track takes cookie color */
+/* ON state */
 .cookie-toggle input:checked ~ .cookie-track .cookie-thumb {
-  transform: translateX(32px);
+  transform: translateX(32px) translateY(-50%);
 }
-/* Flavor-specific ON colors */
-.cookie-toggle[data-flavor="choc"]      input:checked ~ .cookie-track { background: #8B5A2B; border-color: #6B4220; }
-.cookie-toggle[data-flavor="choc-dark"] input:checked ~ .cookie-track { background: #6B4220; border-color: #4A2810; }
-.cookie-toggle[data-flavor="matcha"]    input:checked ~ .cookie-track { background: #5E8C3C; border-color: #4A7030; }
-.cookie-toggle[data-flavor="mm"]        input:checked ~ .cookie-track { background: #8B5A2B; border-color: #6B4220; }
-.cookie-toggle[data-flavor="redvelvet"] input:checked ~ .cookie-track { background: #B05050; border-color: #8A3838; }
+.cookie-toggle input:checked ~ .cookie-track .cookie-thumb img {
+  transform: rotate(18deg);
+}
+
+/* Flavor-specific border colors */
+.cookie-toggle[data-flavor="matcha"]::after    { border-color: #465114; }
+.cookie-toggle[data-flavor="redvelvet"]::after { border-color: #9a4b58; }
 
 /* Disabled (always-on) state */
 .cookie-toggle input:disabled ~ .cookie-track { opacity: 0.6; cursor: not-allowed; }
@@ -212,45 +239,63 @@ body {
 .toggle-divider {
   height: 1px;
   background: rgba(196,168,112,0.3);
-  margin: 2px 8px;
+  margin: 0 8px;
   position: relative;
   z-index: 1;
 }
 
 /* ── Info popover ── */
 .info-popover {
-  position: absolute;
-  left: 12px; right: 12px;
-  top: 50px; /* positioned by JS */
-  background: #FFF4E0;
-  border: 2px dashed rgba(150,100,50,0.4);
-  border-radius: 14px;
+  position: fixed;
+  left: 8px;
+  right: 8px;
+  max-width: calc(100vw - 16px);
+  box-sizing: border-box;
+  top: 50px;
+  background: linear-gradient(90deg, #f4d6be 0%, #f2dcca 100%);
+  border: none;
+  border-radius: 20px;
   padding: 14px 16px;
-  font-family: 'Inter', sans-serif;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--c-fg);
-  z-index: 50;
-  box-shadow: 0 4px 16px rgba(139,90,43,0.15);
-  display: none;
-}
-.info-popover.visible { display: block; }
-.info-popover-close {
-  position: absolute;
-  top: 8px; right: 10px;
-  background: none; border: none;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--c-muted);
-  line-height: 1;
-  padding: 2px;
-}
-.info-popover-title {
   font-family: var(--font);
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--c-fg);
-  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  overflow-wrap: break-word;
+  color: #745b41;
+  z-index: 50;
+  box-shadow:
+    inset 0 -2px 4px rgba(82, 63, 43, 0.3),
+    inset 0 -2px 4px rgba(255, 255, 255, 0.2),
+    inset 0 10px 10px rgba(121, 98, 62, 0.18),
+    inset 0 10px 10px rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.97);
+  will-change: transform, opacity;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0s linear 0.15s;
+}
+.info-popover.visible {
+  visibility: visible;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1),
+    visibility 0s linear 0s;
+}
+.info-popover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #665747;
+  border-radius: 20px;
+  pointer-events: none;
+  filter: url('#hd');
+  z-index: 2;
 }
 
 /* ── Settings modal overlay ── */
@@ -261,7 +306,6 @@ body {
   z-index: 100;
   display: none;
   flex-direction: column;
-  border-radius: 18px;
   overflow: hidden;
 }
 .settings-overlay.visible { display: flex; }
@@ -318,23 +362,55 @@ body {
   inset: 0;
   border-radius: 14px;
   background: #EDE0C8;
-  border: 1.5px solid rgba(139,90,43,0.2);
-  transition: background 0.22s;
   overflow: hidden;
+}
+.settings-track::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  will-change: opacity;
+  pointer-events: none;
+  background: linear-gradient(135deg, #A06838 0%, #6B3010 100%);
+}
+.settings-toggle[data-flavor="matcha"]    .settings-track::before { background: linear-gradient(135deg, #78AA3A 0%, #3A6018 100%); }
+.settings-toggle[data-flavor="redvelvet"] .settings-track::before { background: linear-gradient(135deg, #C86060 0%, #7A2828 100%); }
+.settings-toggle input:checked ~ .settings-track::before { opacity: 1; }
+.settings-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid #665747;
+  border-radius: 14px;
+  pointer-events: none;
+  filter: url('#hd');
+  z-index: 3;
 }
 .settings-thumb {
   position: absolute;
   width: 26px; height: 26px;
-  top: -0.5px; left: -0.5px;
+  top: 50%;
+  left: 1px;
+  transform: translateY(-50%);
   border-radius: 50%;
-  transition: transform 0.22s cubic-bezier(0.34,1.2,0.64,1);
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+  transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+  will-change: transform;
 }
-.settings-thumb img { width: 100%; height: 100%; border-radius: 50%; }
-.settings-toggle input:checked ~ .settings-track { background: #8B5A2B; border-color: #6B4220; }
-.settings-toggle input:checked ~ .settings-track .settings-thumb { transform: translateX(24px); }
-.settings-toggle[data-flavor="matcha"]    input:checked ~ .settings-track { background: #5E8C3C; border-color: #4A7030; }
-.settings-toggle[data-flavor="redvelvet"] input:checked ~ .settings-track { background: #B05050; border-color: #8A3838; }
+.settings-thumb img {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  transition: transform 0.15s cubic-bezier(0.22, 0.61, 0.36, 1);
+  transform-origin: center;
+}
+.settings-toggle input:checked ~ .settings-track .settings-thumb {
+  transform: translateX(24px) translateY(-50%);
+}
+.settings-toggle input:checked ~ .settings-track .settings-thumb img {
+  transform: rotate(14deg);
+}
 
 /* Advanced settings section */
 .advanced-toggle-btn {
@@ -366,7 +442,7 @@ body {
   display: flex;
   gap: 8px;
   padding: 12px 18px;
-  border-top: 1px solid rgba(196,168,112,0.4);
+  border-top: 1px solid rgba(102,87,71,0.35);
   background: rgba(255,248,238,0.8);
 }
 .settings-footer .btn {

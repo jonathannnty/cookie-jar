@@ -4,259 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cookie Jar</title>
-  <link rel="stylesheet" href="../styles/common.css">
-  <style>
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      background: #FFF8EE;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── Top bar ── */
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 32px;
-      background: #FFF8EE;
-      border-bottom: 1.5px solid #665747;
-      flex-shrink: 0;
-    }
-    .topbar-left { display: flex; align-items: center; gap: 10px; }
-    .topbar-icon { height: 44px; width: auto; display: block; }
-    .topbar-title {
-      font-size: 22px; font-weight: 700;
-      color: #4A3018; font-family: 'Fredoka', sans-serif;
-    }
-    .topbar-btn {
-      width: 34px; height: 34px;
-      border: none; background: rgba(196,168,112,0.2);
-      border-radius: 8px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: #8B5A2B; font-size: 16px;
-      transition: background 0.15s;
-    }
-    .topbar-btn:hover { background: rgba(196,168,112,0.4); }
-
-    /* ── Main layout ── */
-    .main {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      flex: 1;
-      overflow: hidden;
-    }
-
-    /* ── Left panel (scrollable) ── */
-    .left-panel {
-      padding: 40px 48px;
-      border-right: 1.5px solid rgba(102,87,71,0.35);
-      overflow-y: auto;
-    }
-    .left-headline {
-      font-size: 36px; font-weight: 700;
-      color: #4A3018;
-      font-family: 'Fredoka', sans-serif;
-      margin-bottom: 16px;
-    }
-    .left-intro {
-      font-family: 'Inter', sans-serif;
-      font-size: 14px; color: #8C6B4A;
-      line-height: 1.7;
-      margin-bottom: 32px;
-      max-width: 480px;
-    }
-
-    /* Cookie type sections */
-    .cookie-section {
-      margin-bottom: 28px;
-      padding: 20px;
-      background: #fff;
-      border-radius: 16px;
-      position: relative;
-    }
-    .cookie-section::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border: 1.5px solid rgba(102,87,71,0.5);
-      border-radius: 16px;
-      pointer-events: none;
-      filter: url('#hd');
-    }
-    .cookie-section-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 10px;
-    }
-    .cookie-section-toggle {
-      position: relative;
-      width: 56px; height: 30px;
-      flex-shrink: 0;
-      cursor: pointer;
-    }
-    .cookie-section-toggle input { display: none; }
-    .cs-track {
-      position: absolute; inset: 0;
-      border-radius: 15px;
-      background: #EDE0C8;
-      transition: background 0.25s;
-      overflow: hidden;
-    }
-    .cs-thumb {
-      position: absolute;
-      width: 28px; height: 28px;
-      top: 50%; left: 1px;
-      transform: translateY(-50%);
-      transition: transform 0.25s cubic-bezier(.34,1.2,.64,1);
-      filter: drop-shadow(0 1px 2px rgba(0,0,0,.2));
-    }
-    .cs-thumb img { width: 100%; height: 100%; border-radius: 50%; }
-    .cookie-section-toggle input:checked ~ .cs-track { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
-    .cookie-section-toggle[data-flavor="matcha"] input:checked ~ .cs-track { background: linear-gradient(135deg, #78AA3A 0%, #3A6018 100%); }
-    .cookie-section-toggle[data-flavor="mm"] input:checked ~ .cs-track { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
-    .cookie-section-toggle[data-flavor="redvelvet"] input:checked ~ .cs-track { background: linear-gradient(135deg, #C86060 0%, #7A2828 100%); }
-    .cookie-section-toggle input:checked ~ .cs-track .cs-thumb { transform: translateX(26px) translateY(-50%); }
-    .cookie-section-toggle::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border: 1.5px solid #665747;
-      border-radius: 15px;
-      pointer-events: none;
-      filter: url('#hd');
-      z-index: 3;
-    }
-    .cookie-section-name {
-      font-size: 18px; font-weight: 600;
-      color: #4A3018;
-      font-family: 'Fredoka', sans-serif;
-    }
-    .cookie-section-body {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px; color: #8C6B4A;
-      line-height: 1.6;
-    }
-
-    /* ── Right panel ── */
-    .right-panel {
-      padding: 40px 48px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      overflow-y: auto;
-    }
-    .right-title {
-      font-size: 28px; font-weight: 700;
-      color: #4A3018;
-      font-family: 'Fredoka', sans-serif;
-      text-align: center;
-      margin-bottom: 24px;
-      flex-shrink: 0;
-    }
-
-    /* ── Milk cup illustration ── */
-    .milk-container {
-      position: relative;
-      width: 180px;
-      height: 270px; /* 180 * (672/450) */
-      margin: 0 auto 28px;
-      flex-shrink: 0;
-    }
-    /* milk fill overlay sits behind the glass image */
-    .milk-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-      overflow: visible;
-    }
-    .milk-cup-img {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 1;
-      display: block;
-    }
-    #milk-fill-rect {
-      transition: transform 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
-    }
-
-    /* ── Safe/Unsafe cards ── */
-    .safe-unsafe {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      width: 100%;
-      max-width: 420px;
-      flex-shrink: 0;
-    }
-    .safety-card {
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      position: relative;
-    }
-    .safety-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      border: 1.5px solid rgba(102,87,71,0.45);
-      border-radius: 16px;
-      pointer-events: none;
-      filter: url('#hd');
-    }
-    .safety-card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .safety-icon-img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-      flex-shrink: 0;
-    }
-    .safety-card-title {
-      font-size: 16px; font-weight: 600;
-      color: #4A3018;
-      font-family: 'Fredoka', sans-serif;
-    }
-    .safety-card-list {
-      list-style: none;
-      padding: 0; margin: 0;
-    }
-    .safety-card-list li {
-      font-family: 'Inter', sans-serif;
-      font-size: 12px; color: #8C6B4A;
-      padding: 4px 0;
-      border-top: 1px solid #F3E5D8;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .safety-card-list li::before { content: '·'; color: #C4A870; font-size: 16px; line-height: 0; }
-    .safety-card.safe   { border-left: 3px solid #4A7C4E; }
-    .safety-card.unsafe { border-left: 3px solid #C0392B; }
-
-    /* Settings shortcut */
-    .settings-shortcut {
-      margin-top: 24px;
-      text-align: center;
-      flex-shrink: 0;
-    }
-    .settings-shortcut p {
-      font-family: 'Inter', sans-serif;
-      font-size: 13px; color: #8C6B4A;
-      margin-bottom: 12px;
-    }
-  </style>
+  <link rel="stylesheet" href="fullpage.css">
 </head>
 <body>
 
-<!-- Hand-drawn border filter -->
-<svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
+<!-- Hand-drawn border filter (shared with popup) -->
+<svg width="0" height="0" class="hd-filter-svg" aria-hidden="true">
   <defs>
     <filter id="hd" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
       <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="6" result="n"/>
@@ -265,312 +18,157 @@
   </defs>
 </svg>
 
-  <!-- Top bar -->
-  <header class="topbar">
-    <div class="topbar-left">
-      <img class="topbar-icon" src="../figma/svg/Logo.svg" alt="Cookie Jar">
-      <span class="topbar-title">Cookie Jar</span>
-    </div>
-    <button class="topbar-btn" id="settingsBtn" title="Open settings" onclick="chrome.runtime.openOptionsPage()">⚙️</button>
-  </header>
+<!-- ══ TOPBAR ══════════════════════════════════════════ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <img class="topbar-logo" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar">
+    <span class="topbar-title">Cookie Jar</span>
+  </div>
+  <div class="topbar-right">
+    <!-- Back arrow -->
+    <button class="topbar-btn" id="btnBack" title="Back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <path d="M19 12H5"/><path d="M12 5l-7 7 7 7"/>
+      </svg>
+    </button>
+    <!-- Settings gear -->
+    <button class="topbar-btn" id="btnSettings" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+      </svg>
+    </button>
+  </div>
+</header>
 
-  <!-- Main two-column layout -->
-  <main class="main">
+<!-- ══ MAIN LAYOUT ═════════════════════════════════════ -->
+<main class="main">
 
-    <!-- Left: Tailor your cookies (scrollable) -->
-    <div class="left-panel">
-      <h1 class="left-headline">Tailor your cookies!</h1>
-      <p class="left-intro">
-        Cookies are small bits of data stored in your browser that help websites remember things
-        like your login, preferences, and settings to provide a smoother browsing experience.<br><br>
-        But not all cookies are created equally — some are used to track your activity across
-        websites and sell that information to advertisers. With Cookie Jar, you can choose between
-        necessary and optional cookies to protect your privacy — without breaking your browsing.
-      </p>
-
-      <!-- Session Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="choc">
-            <input type="checkbox" data-cat="session" checked>
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Session Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Session cookies are temporary cookies that help websites remember you while you use them —
-          like keeping you logged in or saving your cart. They disappear once you close your browser.
-        </p>
-      </div>
-
-      <!-- Authentication Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="choc">
-            <input type="checkbox" data-cat="authentication" checked>
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Authentication Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Authentication cookies keep you signed in to websites even as you navigate between pages.
-          Without them you'd need to re-enter your password on every click. If stolen, attackers
-          can log into your accounts without your password.
-        </p>
-      </div>
-
-      <!-- Tracking Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="mm">
-            <input type="checkbox" data-cat="tracking">
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-mm.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Tracking Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Tracking cookies follow your activity across websites to build detailed profiles about you.
-          In 2025, 93.7 billion stolen tracking cookies were found on the dark web — linked to
-          Google, YouTube, and other major platforms.
-        </p>
-      </div>
-
-      <!-- Third-Party Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="redvelvet">
-            <input type="checkbox" data-cat="third-party">
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Third-Party Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Third-party cookies are set by a domain different from the site you're on — embedded
-          social buttons, videos, or ad networks. They can track your browsing across many sites
-          simultaneously.
-        </p>
-      </div>
-
-      <!-- Analytics Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="matcha">
-            <input type="checkbox" data-cat="analytics">
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Analytics Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Analytics cookies measure how visitors use a website — which pages are popular, where
-          people drop off, and how long they spend. Less intrusive than tracking, though aggregate
-          data can still identify individuals.
-        </p>
-      </div>
-
-      <!-- Advertising Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="redvelvet">
-            <input type="checkbox" data-cat="advertising">
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Advertising Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Advertising cookies deliver targeted ads based on your browsing history and measure
-          ad conversions. They are often shared across hundreds of advertising networks.
-        </p>
-      </div>
-
-      <!-- Functional Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="matcha">
-            <input type="checkbox" data-cat="functional" checked>
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Functional Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          Functional cookies save your preferences — like language, theme, or font size — so you
-          don't reset them every visit. Generally low-risk, though they can persist as a long-lived
-          fingerprint.
-        </p>
-      </div>
-
-      <!-- Unknown Cookies -->
-      <div class="cookie-section">
-        <div class="cookie-section-header">
-          <label class="cookie-section-toggle" data-flavor="choc">
-            <input type="checkbox" data-cat="unknown">
-            <div class="cs-track">
-              <div class="cs-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
-            </div>
-          </label>
-          <span class="cookie-section-name">Unknown Cookies</span>
-        </div>
-        <p class="cookie-section-body">
-          These cookies don't match any known pattern — could be custom app cookies, proprietary
-          tracking, or site-specific data. When uncertain, consider blocking them from sites you
-          don't fully trust.
-        </p>
-      </div>
-
-      <!-- Save button -->
-      <button class="btn btn-primary" id="saveFullPage"
-              style="width:100%;margin-top:8px;padding:14px;font-size:16px;border-radius:14px">
-        Save preferences
-      </button>
+  <!-- ── LEFT: COOKIE JAR ─────────────────────────── -->
+  <div class="jar-panel">
+    <!-- Wooden lid -->
+    <div class="jar-lid">
+      <img src="../figma/svg/Lid.svg" alt="">
     </div>
 
-    <!-- Right: Safe vs Unsafe Cookies -->
-    <div class="right-panel">
-      <h2 class="right-title">Safe vs. Unsafe Cookies</h2>
+    <!-- Scrollable content area -->
+    <div class="jar-body">
+      <div class="jar-scroll">
 
-      <!--
-        Milk cup with dynamic fill level.
-        The milk-overlay SVG sits behind the MilkCup image (z-index 0 vs 1).
-        The glass path in MilkCup.svg has fill-opacity 0.48, so the amber
-        milk fill shows through the semi-transparent glass.
-        milk-fill-rect is translated downward by (1 - fillPct) * glassHeight
-        so it rises from the bottom as more categories are enabled.
-      -->
-      <div class="milk-container">
-        <svg class="milk-overlay" viewBox="0 0 450 672"
-             preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-          <defs>
-            <clipPath id="glass-clip">
-              <path d="M3.04589 36.9196C2.67097 30.9688 2.48351 27.9934 3.71553 24.8778C4.66704 22.4716 6.96972 19.5625 9.09317 18.084C11.8426 16.1696 14.3259 15.7465 19.2924 14.9004C94.7977 2.03687 336.98 -3.97235 430.206 14.5126C435.846 15.6309 438.666 16.1901 441.308 18.0883C443.452 19.6285 445.522 22.2783 446.497 24.7315C447.698 27.7552 447.54 30.9765 447.225 37.4192L418.991 613.579C418.416 625.313 418.129 631.181 415.501 636.649C413.382 641.056 409.231 645.846 405.169 648.57C400.13 651.948 395.08 652.928 384.98 654.887C297.367 671.882 142.179 674.896 67.3797 656.01C60.6565 654.313 57.2949 653.464 52.6407 650.102C49.2474 647.652 44.8637 642.375 43.0768 638.59C40.6258 633.398 40.3328 628.749 39.747 619.45L3.04589 36.9196Z"/>
-            </clipPath>
-          </defs>
-          <!-- starts empty (translateY = 641); JS animates to actual fill level -->
-          <rect id="milk-fill-rect"
-                x="0" y="15" width="450" height="641"
-                fill="#F2E0B0"
-                clip-path="url(#glass-clip)"
-                transform="translate(0, 641)"/>
-        </svg>
-        <img class="milk-cup-img"
-             src="../figma/svg/MilkCup.svg"
-             alt="Milk cup — level reflects how many cookie categories you allow">
+        <h1 class="intro-title">Tailor your cookies!</h1>
+        <p class="intro-body">Cookies are small bits of data stored in your browser that help websites remember things like your login, preferences, and settings to create a smoother browsing experience.</p>
+        <p class="intro-body">But not all cookies are harmless — some are used to track your activity across websites, collect personal data, and build detailed profiles for advertising and analytics.</p>
+        <p class="intro-body">With Cookie Jar, you can manage your cookie preferences at a glance, and set your default preferences so you don't have to choose between convenience and privacy.</p>
+
+        <!-- Session Cookies -->
+        <div class="cookie-section">
+          <h2 class="section-heading">Session Cookies <span class="thumb">👍</span></h2>
+          <p class="section-body">Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.</p>
+        </div>
+
+        <!-- Authentication Cookies -->
+        <div class="cookie-section">
+          <h2 class="section-heading">Authentication Cookies <span class="thumb">👍</span></h2>
+          <p class="section-body">Authentication cookies help websites know that you're logged in. They store a secure ID so you can stay signed in while browsing without entering your password on every page.</p>
+        </div>
+
+        <!-- Tracking Cookies -->
+        <div class="cookie-section">
+          <h2 class="section-heading">Tracking Cookies <span class="thumb">👎</span></h2>
+          <p class="section-body">Tracking cookies follow your activity across websites to collect data about your behavior, interests, and browsing habits — often to personalize ads and analytics.</p>
+        </div>
+
+        <!-- Third-Party Cookies -->
+        <div class="cookie-section">
+          <h2 class="section-heading">Third-Party Cookies <span class="thumb">👎</span></h2>
+          <p class="section-body">Third-party cookies are set by websites other than the one you're currently visiting. They're commonly used for cross-site tracking, targeted advertising, and embedded content like social media buttons.</p>
+        </div>
+
       </div>
+    </div>
+  </div><!-- .jar-panel -->
 
-      <!-- Safe vs Unsafe info cards -->
-      <div class="safe-unsafe">
-        <div class="safety-card safe">
-          <div class="safety-card-header">
-            <img class="safety-icon-img" src="../figma/svg/SafeCookie.svg" alt="">
-            <div class="safety-card-title">Safe Cookies</div>
+  <!-- ── RIGHT: MILK GLASS ─────────────────────────── -->
+  <div class="glass-panel">
+    <div class="glass-outer">
+
+      <!-- Animated milk fill (rises as safe categories are enabled) -->
+      <svg class="milk-fill-svg" viewBox="0 0 450 672"
+           preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <defs>
+          <clipPath id="glass-clip">
+            <path d="M3.04589 36.9196C2.67097 30.9688 2.48351 27.9934 3.71553 24.8778C4.66704 22.4716 6.96972 19.5625 9.09317 18.084C11.8426 16.1696 14.3259 15.7465 19.2924 14.9004C94.7977 2.03687 336.98 -3.97235 430.206 14.5126C435.846 15.6309 438.666 16.1901 441.308 18.0883C443.452 19.6285 445.522 22.2783 446.497 24.7315C447.698 27.7552 447.54 30.9765 447.225 37.4192L418.991 613.579C418.416 625.313 418.129 631.181 415.501 636.649C413.382 641.056 409.231 645.846 405.169 648.57C400.13 651.948 395.08 652.928 384.98 654.887C297.367 671.882 142.179 674.896 67.3797 656.01C60.6565 654.313 57.2949 653.464 52.6407 650.102C49.2474 647.652 44.8637 642.375 43.0768 638.59C40.6258 633.398 40.3328 628.749 39.747 619.45L3.04589 36.9196Z"/>
+          </clipPath>
+        </defs>
+        <rect id="milk-fill-rect"
+              x="0" y="15" width="450" height="641"
+              fill="#F2E0B0"
+              clip-path="url(#glass-clip)"
+              transform="translate(0,641)"/>
+      </svg>
+
+      <!-- Glass illustration on top of the fill -->
+      <img class="milk-cup-img" src="../figma/svg/MilkCup.svg"
+           alt="Milk glass — fill level reflects enabled safe cookies">
+
+      <!-- Text content overlaid on the glass -->
+      <div class="glass-content">
+
+        <!-- Title in the rim area -->
+        <div class="glass-title-area">
+          <h2 class="glass-title">Safe vs. Unsafe<br>Cookies</h2>
+        </div>
+
+        <!-- Safe + Unsafe sections in the glass body -->
+        <div class="glass-body">
+
+          <!-- Safe Cookies -->
+          <div class="glass-section">
+            <img class="glass-cookie-img" src="../figma/svg/SafeCookie.svg" alt="Safe cookie">
+            <div class="glass-text">
+              <div class="glass-section-name">Safe Cookies</div>
+              <ul class="glass-list">
+                <li>Protect user privacy</li>
+                <li>Keep users logged in securely</li>
+                <li>Improve website functionality</li>
+                <li>Usually temporary or limited-use</li>
+                <li>Only used by the website you visit</li>
+                <li>Collect minimal personal data</li>
+                <li>Support safer browsing experiences</li>
+              </ul>
+              <p class="glass-includes">Includes session &amp; authentication</p>
+            </div>
           </div>
-          <ul class="safety-card-list">
-            <li>Session cookies</li>
-            <li>Authentication</li>
-            <li>Security tokens</li>
-            <li>Consent records</li>
-            <li>Load balancing</li>
-          </ul>
-        </div>
-        <div class="safety-card unsafe">
-          <div class="safety-card-header">
-            <img class="safety-icon-img" src="../figma/svg/UnsafeCookie.svg" alt="">
-            <div class="safety-card-title">Unsafe Cookies</div>
+
+          <!-- Unsafe Cookies -->
+          <div class="glass-section">
+            <img class="glass-cookie-img" src="../figma/svg/UnsafeCookie.svg" alt="Unsafe cookie">
+            <div class="glass-text">
+              <div class="glass-section-name">Unsafe Cookies</div>
+              <ul class="glass-list">
+                <li>Track browsing activity across websites</li>
+                <li>Collect excessive personal data</li>
+                <li>Used for targeted advertising</li>
+                <li>Monitor user behavior and habits</li>
+                <li>May sell or distribute user data</li>
+                <li>Increase risk of data misuse or leaks</li>
+              </ul>
+              <p class="glass-includes">Includes tracking &amp; third-party</p>
+            </div>
           </div>
-          <ul class="safety-card-list">
-            <li>Cross-site tracking</li>
-            <li>Advertising profiles</li>
-            <li>Third-party trackers</li>
-            <li>Behavioral analytics</li>
-            <li>Zombie cookies</li>
-          </ul>
+
         </div>
-      </div>
+      </div><!-- .glass-content -->
 
-      <div class="settings-shortcut">
-        <p>Want fine-grained control? Open the full settings to manage each cookie type individually.</p>
-        <button class="btn btn-outline" onclick="chrome.runtime.openOptionsPage()"
-                style="font-size:14px;padding:10px 24px;border-radius:12px;border:1.5px solid #E6D5C3;color:#4A3018;background:transparent;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:500">
-          Open full settings →
-        </button>
-      </div>
-    </div>
+    </div><!-- .glass-outer -->
+  </div><!-- .glass-panel -->
 
-  </main>
+</main>
 
-  <script src="../utils/cookie-classifier.js"></script>
-  <script src="../utils/prefs.js"></script>
-  <script>
-    'use strict';
-
-    let currentPrefs = null;
-
-    const ALL_CATS = [
-      'session', 'authentication', 'tracking', 'third-party',
-      'analytics', 'advertising', 'functional', 'unknown'
-    ];
-
-    /* top of glass y=15, bottom y=656, height=641 in SVG coords */
-    const GLASS_HEIGHT = 641;
-
-    function updateMilkLevel() {
-      if (!currentPrefs) return;
-      const enabledCount = ALL_CATS.filter(c => currentPrefs.categories[c] !== false).length;
-      const fillPct = enabledCount / ALL_CATS.length;
-      const translateY = GLASS_HEIGHT * (1 - fillPct);
-      const rect = document.getElementById('milk-fill-rect');
-      if (rect) rect.setAttribute('transform', `translate(0, ${translateY})`);
-    }
-
-    async function loadAndSync() {
-      const data = await chrome.storage.local.get('preferences');
-      currentPrefs = CookiePrefs.mergePrefs(data.preferences);
-      document.querySelectorAll('[data-cat]').forEach(input => {
-        const cat = input.dataset.cat;
-        if (currentPrefs.categories[cat] !== undefined) {
-          input.checked = currentPrefs.categories[cat];
-        }
-      });
-      updateMilkLevel();
-    }
-
-    document.querySelectorAll('[data-cat]').forEach(input => {
-      input.addEventListener('change', async () => {
-        const data = await chrome.storage.local.get('preferences');
-        currentPrefs = CookiePrefs.mergePrefs(data.preferences);
-        currentPrefs.categories[input.dataset.cat] = input.checked;
-        await chrome.storage.local.set({ preferences: currentPrefs });
-        updateMilkLevel();
-      });
-    });
-
-    document.getElementById('saveFullPage')?.addEventListener('click', async () => {
-      const data = await chrome.storage.local.get('preferences');
-      currentPrefs = CookiePrefs.mergePrefs(data.preferences);
-      document.querySelectorAll('[data-cat]').forEach(input => {
-        currentPrefs.categories[input.dataset.cat] = input.checked;
-      });
-      await chrome.storage.local.set({ preferences: currentPrefs });
-      updateMilkLevel();
-
-      const btn = document.getElementById('saveFullPage');
-      btn.textContent = 'Saved ✓';
-      setTimeout(() => { btn.textContent = 'Save preferences'; }, 2000);
-    });
-
-    loadAndSync();
-  </script>
+<script src="../utils/cookie-classifier.js"></script>
+<script src="../utils/prefs.js"></script>
+<script src="fullpage.js"></script>
 </body>
 </html>
