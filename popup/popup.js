@@ -1,38 +1,29 @@
 'use strict';
 
-// Cookie info descriptions (matches ModalPopup-1.png style)
 const COOKIE_INFO = {
   session: {
-    title: 'Session Cookies',
-    body: 'Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.',
+    body: 'Session cookies are temporary cookies that help websites remember you while you browse — like keeping your cart full or staying logged in. Close your browser and poof, they\'re gone.',
   },
   authentication: {
-    title: 'Auth Cookies',
-    body: 'Authentication cookies verify your identity and keep you signed in between page visits. Without them you\'d need to re-enter your password on every page. Theft of these cookies can allow attackers to access your account without a password.',
+    body: 'Auth cookies keep you signed in between pages so you don\'t have to type your password all over again. Think of them as a little "yep, it\'s you" note the site holds onto.',
   },
   tracking: {
-    title: 'Tracking Cookies',
-    body: 'Tracking cookies follow your activity across websites to build advertising profiles about you. They record which pages you visit, what you click, and how long you stay — often shared with ad networks and data brokers.',
+    body: 'Tracking cookies follow your trail across different websites to build a picture of what you\'re into. They note what you click and how long you stay — then share that with ad networks.',
   },
   'third-party': {
-    title: 'Third-Party Cookies',
-    body: 'Third-party cookies are set by a different domain than the site you\'re currently on — like embedded social buttons, videos, or ad networks. They can track your browsing across many different websites simultaneously.',
+    body: 'Third-party cookies come from other domains — like social share buttons or embedded videos — not the site you\'re actually on. They can quietly track your browsing across many sites at once.',
   },
   analytics: {
-    title: 'Analytics Cookies',
-    body: 'Analytics cookies measure how visitors use a website — which pages are popular, where people drop off, and how long they stay. While generally less harmful, this data can still identify you when combined with other information.',
+    body: 'Analytics cookies help sites figure out which pages people love, where they drop off, and how long they hang around. Usually pretty harmless, but they can still build a fuzzy picture of who you are.',
   },
   advertising: {
-    title: 'Advertising Cookies',
-    body: 'Advertising cookies deliver targeted ads based on your browsing history and measure whether you clicked on an ad. They are often shared across hundreds of advertising networks.',
+    body: 'Advertising cookies are what make ads follow you around the internet. They log your browsing history and measure ad clicks — then that info gets spread across hundreds of ad networks.',
   },
   functional: {
-    title: 'Functional Cookies',
-    body: 'Functional cookies save your preferences — like your language, theme, or font size — so you don\'t have to reset them every visit. Generally low-risk, though they can persist as a fingerprint.',
+    body: 'Functional cookies remember your preferences — like your language or color theme — so you don\'t have to reconfigure things every visit. Low risk, just a little memory of how you like things.',
   },
   necessary: {
-    title: 'Necessary Cookies',
-    body: 'Necessary cookies are required for the website to function at all. They enable core features like page navigation, secure areas, and form submission. They cannot be disabled without breaking the site.',
+    body: 'Necessary cookies are the ones that keep a website running at all. They handle logins, page navigation, and form submissions. Without them, the site would basically break.',
   },
 };
 
@@ -67,20 +58,10 @@ async function loadPrefs() {
 
 // ── Apply prefs to main toggles ────────────────────────
 function syncMainToggles() {
-  const mode = currentPrefs.mode;
-
   for (const [id, cat] of Object.entries(TOGGLE_CATS)) {
     const el = document.getElementById(id);
     if (!el) continue;
-
-    if (mode === 'simple') {
-      const isNecessary = CookieClassifier.isNecessaryCategory(cat);
-      el.checked = isNecessary
-        ? currentPrefs.simple.necessary !== false
-        : currentPrefs.simple.optional === true;
-    } else {
-      el.checked = currentPrefs.categories[cat] !== false;
-    }
+    el.checked = currentPrefs.categories[cat] !== false;
   }
 }
 
@@ -119,79 +100,54 @@ Object.keys(TOGGLE_CATS).forEach(id => {
   if (!el) return;
   el.addEventListener('change', async () => {
     const cat = TOGGLE_CATS[id];
-    const isOptional = !CookieClassifier.isNecessaryCategory(cat);
-
-    if (currentPrefs.mode === 'simple' && isOptional) {
-      currentPrefs.simple.optional = el.checked;
-      // Keep the other optional toggle in sync visually
-      for (const [otherId, otherCat] of Object.entries(TOGGLE_CATS)) {
-        if (otherId !== id && !CookieClassifier.isNecessaryCategory(otherCat)) {
-          const other = document.getElementById(otherId);
-          if (other) other.checked = el.checked;
-        }
-      }
-    } else if (currentPrefs.mode !== 'simple') {
-      currentPrefs.categories[cat] = el.checked;
-    }
-    // In simple mode, necessary toggles are informational — no state change needed.
-
+    currentPrefs.categories[cat] = el.checked;
     await chrome.storage.local.set({ preferences: currentPrefs });
     if (currentTab?.url) await bg({ type: 'APPLY_PREFS', url: currentTab.url });
-    toast(el.checked ? `${COOKIE_INFO[cat]?.title || cat} allowed` : `${COOKIE_INFO[cat]?.title || cat} blocked`);
+    toast(el.checked ? `${cat} allowed` : `${cat} blocked`);
   });
 });
 
-// ── Info popover ───────────────────────────────────────
-const popover    = document.getElementById('infoPopover');
-const infoTitle  = document.getElementById('infoTitle');
-const infoBody   = document.getElementById('infoBody');
-const infoClose  = document.getElementById('infoClose');
-let   activeInfo = null;
+// ── Info popover (hover-triggered) ────────────────────
+const popover  = document.getElementById('infoPopover');
+const infoBody = document.getElementById('infoBody');
+let   hideTimer = null;
+
+function showPopover(cat, btn) {
+  const info = COOKIE_INFO[cat];
+  if (!info) return;
+  if (hideTimer) { clearTimeout(hideTimer); hideTimer = null; }
+
+  infoBody.textContent = info.body;
+
+  const rect = btn.closest('.toggle-row').getBoundingClientRect();
+  const belowTop = rect.bottom + 4;
+  popover.style.top = belowTop + 'px';
+  popover.classList.add('visible');
+
+  // Flip above the row if the popover bottom would overflow the viewport
+  requestAnimationFrame(() => {
+    if (belowTop + popover.offsetHeight > window.innerHeight - 4) {
+      popover.style.top = Math.max(4, rect.top - popover.offsetHeight - 4) + 'px';
+    }
+  });
+}
+
+function hidePopover() {
+  hideTimer = setTimeout(() => {
+    popover.classList.remove('visible');
+    hideTimer = null;
+  }, 40);
+}
 
 document.querySelectorAll('.info-btn').forEach(btn => {
-  btn.addEventListener('click', e => {
-    e.stopPropagation();
-    const cat = btn.dataset.cat;
-
-    if (activeInfo === cat && popover.classList.contains('visible')) {
-      popover.classList.remove('visible');
-      activeInfo = null;
-      return;
-    }
-
-    const info = COOKIE_INFO[cat];
-    if (!info) return;
-    infoTitle.textContent = info.title;
-    infoBody.textContent  = info.body;
-
-    // Position below the toggle row
-    const row    = btn.closest('.toggle-row');
-    const body   = document.getElementById('widgetBody');
-    const rowTop = row.offsetTop + row.offsetHeight + body.offsetTop;
-    popover.style.top = rowTop + 'px';
-
-    popover.classList.add('visible');
-    activeInfo = cat;
-  });
-});
-
-infoClose.addEventListener('click', () => {
-  popover.classList.remove('visible');
-  activeInfo = null;
-});
-
-// Close popover on outside click
-document.addEventListener('click', e => {
-  if (!popover.contains(e.target) && !e.target.closest('.info-btn')) {
-    popover.classList.remove('visible');
-    activeInfo = null;
-  }
+  btn.addEventListener('mouseenter', () => showPopover(btn.dataset.cat, btn));
+  btn.addEventListener('mouseleave', hidePopover);
 });
 
 // ── Settings modal ─────────────────────────────────────
 const settingsOverlay = document.getElementById('settingsOverlay');
 
-document.getElementById('btnSettings').addEventListener('click', () => {
+document.getElementById('btnSettings')?.addEventListener('click', () => {
   syncSettingsToggles();
   settingsOverlay.classList.add('visible');
   popover.classList.remove('visible');
@@ -234,5 +190,4 @@ document.getElementById('btnFullPage').addEventListener('click', () => {
 (async () => {
   await loadPrefs();
   syncMainToggles();
-  await loadTabInfo();
 })();

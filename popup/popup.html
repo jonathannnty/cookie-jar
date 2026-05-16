@@ -10,107 +10,86 @@
 <!-- Hand-drawn border filter (Drone brush approximation) -->
 <svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
   <defs>
-    <filter id="hd" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
-      <feTurbulence type="fractalNoise" baseFrequency="0.065" numOctaves="3" seed="6" result="n"/>
-      <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+    <filter id="hd" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="6" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </defs>
 </svg>
-
 <div class="widget-shell">
 <div class="widget">
 
   <!-- ══ Wooden header bar ══ -->
   <div class="widget-header">
     <div class="widget-header-left">
-      <img class="header-jar-icon" src="../figma/svg/Logo.svg" alt="Cookie Jar">
+      <img class="header-jar-icon" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar">
     </div>
     <span class="widget-title">Cookie Jar</span>
     <div class="widget-header-right">
       <button class="header-btn" id="btnFullPage" title="Open full page">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-          <path d="M10 2h4v4M14 2l-6 6M6 4H3a1 1 0 00-1 1v8a1 1 0 001 1h8a1 1 0 001-1v-3"/>
-        </svg>
-      </button>
-      <button class="header-btn" id="btnSettings" title="Settings">
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
-          <circle cx="8" cy="8" r="2.5"/>
-          <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06"/>
-        </svg>
+        <img src="../figma/svg/OpenNewLinkIcon.svg" alt="">
       </button>
     </div>
   </div>
 
   <!-- ══ Jar body (cookie list) ══ -->
   <div class="widget-body" id="widgetBody">
+    <div class="toggle-list">
+      <!-- Row: Session Cookies -->
+      <div class="toggle-row" data-cat="session">
+        <label class="cookie-toggle" data-flavor="choc">
+          <input type="checkbox" id="tog-session">
+          <div class="cookie-track">
+            <div class="cookie-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
+          </div>
+        </label>
+        <span class="toggle-label">Session Cookies</span>
+        <button class="info-btn" data-cat="session"><img src="../figma/svg/InfoIcon.svg" alt="Info"></button>
+      </div>
 
-    <!-- Row: Session Cookies -->
-    <div class="toggle-row" data-cat="session">
-      <label class="cookie-toggle" data-flavor="choc">
-        <input type="checkbox" id="tog-session" checked>
-        <div class="cookie-track">
-          <div class="cookie-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
-        </div>
-      </label>
-      <span class="toggle-label">Session Cookies</span>
-      <button class="info-btn" data-cat="session">i</button>
+      <div class="toggle-divider"></div>
+
+      <!-- Row: Auth Cookies -->
+      <div class="toggle-row" data-cat="authentication">
+        <label class="cookie-toggle" data-flavor="matcha">
+          <input type="checkbox" id="tog-auth">
+          <div class="cookie-track">
+            <div class="cookie-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
+          </div>
+        </label>
+        <span class="toggle-label">Auth Cookies</span>
+        <button class="info-btn" data-cat="authentication"><img src="../figma/svg/InfoIcon.svg" alt="Info"></button>
+      </div>
+
+      <div class="toggle-divider"></div>
+
+      <!-- Row: Tracking Cookies -->
+      <div class="toggle-row" data-cat="tracking">
+        <label class="cookie-toggle" data-flavor="mm">
+          <input type="checkbox" id="tog-tracking">
+          <div class="cookie-track">
+            <div class="cookie-thumb"><img src="../icons/cookie-mm.svg" alt=""></div>
+          </div>
+        </label>
+        <span class="toggle-label">Tracking Cookies</span>
+        <button class="info-btn" data-cat="tracking"><img src="../figma/svg/InfoIcon.svg" alt="Info"></button>
+      </div>
+
+      <div class="toggle-divider"></div>
+
+      <!-- Row: Third-Party Cookies -->
+      <div class="toggle-row" data-cat="third-party">
+        <label class="cookie-toggle" data-flavor="redvelvet">
+          <input type="checkbox" id="tog-thirdparty">
+          <div class="cookie-track">
+            <div class="cookie-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
+          </div>
+        </label>
+        <span class="toggle-label">Third-Party Cookies</span>
+        <button class="info-btn" data-cat="third-party"><img src="../figma/svg/InfoIcon.svg" alt="Info"></button>
+      </div>
     </div>
-
-    <div class="toggle-divider"></div>
-
-    <!-- Row: Auth Cookies -->
-    <div class="toggle-row" data-cat="authentication">
-      <label class="cookie-toggle" data-flavor="matcha">
-        <input type="checkbox" id="tog-auth" checked>
-        <div class="cookie-track">
-          <div class="cookie-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
-        </div>
-      </label>
-      <span class="toggle-label">Auth Cookies</span>
-      <button class="info-btn" data-cat="authentication">i</button>
-    </div>
-
-    <div class="toggle-divider"></div>
-
-    <!-- Row: Tracking Cookies -->
-    <div class="toggle-row" data-cat="tracking">
-      <label class="cookie-toggle" data-flavor="mm">
-        <input type="checkbox" id="tog-tracking">
-        <div class="cookie-track">
-          <div class="cookie-thumb"><img src="../icons/cookie-mm.svg" alt=""></div>
-        </div>
-      </label>
-      <span class="toggle-label">Tracking Cookies</span>
-      <button class="info-btn" data-cat="tracking">i</button>
-    </div>
-
-    <div class="toggle-divider"></div>
-
-    <!-- Row: Third-Party Cookies -->
-    <div class="toggle-row" data-cat="third-party">
-      <label class="cookie-toggle" data-flavor="redvelvet">
-        <input type="checkbox" id="tog-thirdparty">
-        <div class="cookie-track">
-          <div class="cookie-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div>
-        </div>
-      </label>
-      <span class="toggle-label">Third-Party Cookies</span>
-      <button class="info-btn" data-cat="third-party">i</button>
-    </div>
-
-    <!-- Cookie count bar -->
-    <div id="countBar" style="display:flex;gap:8px;justify-content:center;margin-top:14px;padding-top:10px;border-top:1px dashed rgba(150,100,50,0.25);position:relative;z-index:1">
-      <span id="siteLabel" style="font-size:11px;color:#8C6B4A;font-family:'Inter',sans-serif;text-align:center"></span>
-    </div>
-
   </div><!-- .widget-body -->
-
-  <!-- ══ Info popover ══ -->
-  <div class="info-popover" id="infoPopover">
-    <div class="info-popover-title" id="infoTitle"></div>
-    <button class="info-popover-close" id="infoClose">✕</button>
-    <div id="infoBody"></div>
-  </div>
 
   <!-- ══ Settings modal ══ -->
   <div class="settings-overlay" id="settingsOverlay">
@@ -123,7 +102,7 @@
         <!-- Session -->
         <div class="settings-row">
           <label class="settings-toggle" data-flavor="choc">
-            <input type="checkbox" data-cat="session" checked>
+            <input type="checkbox" data-cat="session">
             <div class="settings-track">
               <div class="settings-thumb"><img src="../icons/cookie-choc.svg" alt=""></div>
             </div>
@@ -143,7 +122,7 @@
         <!-- Auth -->
         <div class="settings-row">
           <label class="settings-toggle" data-flavor="matcha">
-            <input type="checkbox" data-cat="authentication" checked>
+            <input type="checkbox" data-cat="authentication">
             <div class="settings-track">
               <div class="settings-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div>
             </div>
@@ -219,7 +198,13 @@
   </div><!-- .settings-overlay -->
 
 </div><!-- .widget -->
-</div><!-- .widget-shell -->
+</div>
+
+
+<!-- Info popover lives outside .widget so overflow:hidden never clips it -->
+<div class="info-popover" id="infoPopover">
+  <div id="infoBody"></div>
+</div>
 
 <div class="toast" id="toast"></div>
 
