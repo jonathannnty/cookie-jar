@@ -7,12 +7,17 @@
 </head>
 <body>
 
-<!-- Hand-drawn border filter (Drone brush approximation) -->
+<!-- Hand-drawn border filters -->
 <svg width="0" height="0" style="position:absolute;overflow:hidden" aria-hidden="true">
   <defs>
     <filter id="hd" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
       <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="6" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <!-- Drone brush: thicker displacement, richer noise for container strokes -->
+    <filter id="drone" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.025 0.055" numOctaves="5" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
   </defs>
 </svg>
@@ -24,7 +29,6 @@
     <div class="widget-header-left">
       <img class="header-jar-icon" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar">
     </div>
-    <span class="widget-title">Cookie Jar</span>
     <div class="widget-header-right">
       <button class="header-btn" id="btnFullPage" title="Open full page">
         <img src="../figma/svg/OpenNewLinkIcon.svg" alt="">

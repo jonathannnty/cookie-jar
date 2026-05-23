@@ -1,6 +1,6 @@
 /* Cookie Jar — Popup. Matches Figma WidgetPanel design. */
 
-@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
 
 :root {
   --c-primary:   #8B5A2B;
@@ -16,7 +16,11 @@ html {
 
 body {
   font-family: var(--font);
-  background: transparent;
+  background-color: #bda07c;
+  background-image: url('../figma/svg/CookieJar.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: calc(100% - 20px) calc(100% - 20px);
   color: var(--c-fg);
   width: 374px;
   height: 353px;
@@ -40,19 +44,15 @@ body {
   width: 374px;
   height: 353px;
   overflow: hidden;
-  background-color: #BDA07C;
-  background-image: url('../figma/svg/CookieJar.svg');
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  box-shadow: inset -4px -4.5px 10px rgba(53, 41, 28, 0.3);
+  background: transparent;
 }
 
-/* ── Header bar (sits in the brown outer frame area of the SVG) ── */
+/* ── Header bar ── */
 .widget-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
   align-items: center;
-  padding: 10px 14px 8px;
+  justify-content: space-between;
+  padding: 10px 14px;
   background: transparent;
   position: relative;
   z-index: 2;
@@ -65,13 +65,12 @@ body {
 .widget-header-right {
   display: flex;
   align-items: center;
-  gap: 4px;
-  justify-content: flex-end;
 }
 .header-jar-icon {
   height: 28px;
   width: auto;
   display: block;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.28));
 }
 .widget-title {
   font-size: 24px;
@@ -92,22 +91,36 @@ body {
   color: #5A3010;
   font-size: 15px;
   border-radius: 6px;
-  transition: background 0.15s;
   flex-shrink: 0;
 }
-.header-btn:hover { background: rgba(0,0,0,0.1); }
-.header-btn img { width: 20px; height: 20px; display: block; }
+.header-btn img {
+  width: 20px; height: 20px; display: block;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.28));
+  transition: filter 0.15s;
+}
+.header-btn:hover img {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.52));
+}
 
-/* ── Jar body (sits in the cream inner area of CookieJar.svg) ── */
+/* ── Jar body ── */
 .widget-body {
   position: relative;
   background: transparent;
-  padding: 28px 28px 24px;
+  padding: 16px 28px;
+  margin-top: 28px;
+  height: 242px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Toggle list wrapper ── */
 .toggle-list {
-  padding-top: 0;
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /* ── Cookie toggle rows ── */
@@ -115,26 +128,29 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 4px;
+  padding: 0 16px;
   border-radius: 10px;
   cursor: default;
-  transition: background 0.08s;
   position: relative;
   z-index: 1;
 }
-.toggle-row:hover { background: rgba(196, 168, 112, 0.12); }
 
 .toggle-label {
   flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: #94765d;
-  white-space: nowrap;
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  font-weight: 400;
+  color: #7A6350;
+  white-space: normal;
+  line-height: 1;
+  text-shadow:
+    0 2px 4px rgba(74, 48, 24, 0.45),
+    0 -1px 1px rgba(255, 255, 255, 0.2);
 }
 
 /* ── Info button ── */
 .info-btn {
-  width: 22px; height: 22px;
+  width: 18px; height: 18px;
   border: none;
   background: transparent;
   padding: 0;
@@ -144,15 +160,14 @@ body {
   transition: transform 0.1s, filter 0.15s;
 }
 .info-btn img { width: 100%; height: 100%; display: block; }
-.info-btn:hover  { filter: brightness(1.15); }
-.info-btn:active { transform: scale(0.92); }
+.info-btn:hover  { filter: brightness(1.18); transform: scale(1.06); }
 
 /* ── Cookie-shaped toggle ── */
 .cookie-toggle {
   position: relative;
   display: inline-block;
-  width: 68px;
-  height: 36px;
+  width: 54px;
+  height: 28px;
   flex-shrink: 0;
   cursor: pointer;
 }
@@ -163,7 +178,7 @@ body {
 .cookie-track {
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: 14px;
   background: linear-gradient(-90deg, rgb(239, 227, 216) 0%, rgb(230, 200, 171) 100%);
   overflow: hidden;
   box-shadow:
@@ -177,7 +192,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 18px;
+  border-radius: 14px;
   opacity: 0;
   transition: opacity 0.15s ease;
   will-change: opacity;
@@ -185,17 +200,17 @@ body {
 }
 .cookie-toggle[data-flavor="choc"]      .cookie-track::before { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
 .cookie-toggle[data-flavor="choc-dark"] .cookie-track::before { background: linear-gradient(135deg, #7A4820 0%, #3A1808 100%); }
-.cookie-toggle[data-flavor="matcha"]    .cookie-track::before { background: linear-gradient(135deg, #78AA3A 0%, #3A6018 100%); }
+.cookie-toggle[data-flavor="matcha"]    .cookie-track::before { background: linear-gradient(to right, #BEC987 0%, #889643 85%); }
 .cookie-toggle[data-flavor="mm"]        .cookie-track::before { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
 .cookie-toggle[data-flavor="redvelvet"] .cookie-track::before { background: linear-gradient(135deg, #C86060 0%, #7A2828 100%); }
 .cookie-toggle input:checked ~ .cookie-track::before { opacity: 1; }
-/* Hand-drawn border overlay on the toggle track */
+/* Hand-drawn border overlay — tight to fill */
 .cookie-toggle::after {
   content: '';
   position: absolute;
-  inset: 0;
-  border: 2px solid #665747;
-  border-radius: 18px;
+  inset: -1px;
+  border: 1.5px solid #665747;
+  border-radius: 15px;
   pointer-events: none;
   filter: url('#hd');
   z-index: 3;
@@ -203,7 +218,7 @@ body {
 /* Cookie thumb image */
 .cookie-thumb {
   position: absolute;
-  width: 32px; height: 32px;
+  width: 24px; height: 24px;
   top: 50%;
   left: 2px;
   transform: translateY(-50%);
@@ -222,7 +237,7 @@ body {
 
 /* ON state */
 .cookie-toggle input:checked ~ .cookie-track .cookie-thumb {
-  transform: translateX(32px) translateY(-50%);
+  transform: translateX(26px) translateY(-50%);
 }
 .cookie-toggle input:checked ~ .cookie-track .cookie-thumb img {
   transform: rotate(18deg);
@@ -239,7 +254,7 @@ body {
 .toggle-divider {
   height: 1px;
   background: rgba(196,168,112,0.3);
-  margin: 0 8px;
+  margin: 0 20px;
   position: relative;
   z-index: 1;
 }

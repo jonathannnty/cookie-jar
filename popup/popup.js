@@ -119,16 +119,29 @@ function showPopover(cat, btn) {
 
   infoBody.textContent = info.body;
 
-  const rect = btn.closest('.toggle-row').getBoundingClientRect();
-  const belowTop = rect.bottom + 4;
-  popover.style.top = belowTop + 'px';
+  // Park off-screen so the browser lays out the popover before we measure it.
+  // The fade-in transition begins here; by the time a frame is painted the
+  // opacity is still ~0, so there is no visible jump.
+  popover.style.top = '-9999px';
   popover.classList.add('visible');
 
-  // Flip above the row if the popover bottom would overflow the viewport
   requestAnimationFrame(() => {
-    if (belowTop + popover.offsetHeight > window.innerHeight - 4) {
-      popover.style.top = Math.max(4, rect.top - popover.offsetHeight - 4) + 'px';
+    const row   = btn.closest('.toggle-row');
+    const rect  = row.getBoundingClientRect();
+    const popH  = popover.offsetHeight;
+    const viewH = window.innerHeight;
+    const GAP   = 6;
+
+    // Prefer below the row; flip above if it would overflow the bottom edge.
+    let top = rect.bottom + GAP;
+    if (top + popH > viewH - 4) {
+      top = rect.top - popH - GAP;
     }
+
+    // Hard clamp — never clip against the top or bottom of the popup window.
+    top = Math.max(4, Math.min(top, viewH - popH - 4));
+
+    popover.style.top = top + 'px';
   });
 }
 
@@ -136,7 +149,7 @@ function hidePopover() {
   hideTimer = setTimeout(() => {
     popover.classList.remove('visible');
     hideTimer = null;
-  }, 40);
+  }, 80);
 }
 
 document.querySelectorAll('.info-btn').forEach(btn => {
