@@ -179,7 +179,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 14px;
-  background: linear-gradient(-90deg, rgb(239, 227, 216) 0%, rgb(230, 200, 171) 100%);
+  background: linear-gradient(to right, #EFE3D8 0%, #E6C8AB 100%);
   overflow: hidden;
   box-shadow:
     inset 0 -1px 2px rgba(82, 63, 43, 0.3),
@@ -198,11 +198,11 @@ body {
   will-change: opacity;
   pointer-events: none;
 }
-.cookie-toggle[data-flavor="choc"]      .cookie-track::before { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
+.cookie-toggle[data-flavor="choc"]      .cookie-track::before { background: linear-gradient(to right, #A7855F 0%, #7D4D1E 100%); }
 .cookie-toggle[data-flavor="choc-dark"] .cookie-track::before { background: linear-gradient(135deg, #7A4820 0%, #3A1808 100%); }
 .cookie-toggle[data-flavor="matcha"]    .cookie-track::before { background: linear-gradient(to right, #BEC987 0%, #889643 85%); }
-.cookie-toggle[data-flavor="mm"]        .cookie-track::before { background: linear-gradient(135deg, #A06838 0%, #6B3010 100%); }
-.cookie-toggle[data-flavor="redvelvet"] .cookie-track::before { background: linear-gradient(135deg, #C86060 0%, #7A2828 100%); }
+.cookie-toggle[data-flavor="mm"]        .cookie-track::before { background: linear-gradient(to right, #A7855F 0%, #7D4D1E 100%); }
+.cookie-toggle[data-flavor="redvelvet"] .cookie-track::before { background: linear-gradient(to right, #E8B5AD 0%, #dc7d6f 100%); }
 .cookie-toggle input:checked ~ .cookie-track::before { opacity: 1; }
 /* Hand-drawn border overlay — tight to fill */
 .cookie-toggle::after {
@@ -481,7 +481,7 @@ body {
   position: fixed;
   bottom: 12px; left: 50%;
   transform: translateX(-50%) translateY(6px);
-  background: var(--c-fg);
+  background: #7B4B1F;
   color: #fff;
   padding: 7px 16px;
   border-radius: 999px;
@@ -491,6 +491,16 @@ body {
   pointer-events: none;
   z-index: 200;
   white-space: nowrap;
+}
+/* Brush-stroke outline — same color as fill so only the distorted edge shows */
+.toast::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border: 3px solid #7B4B1F;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: url('#drone');
 }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
