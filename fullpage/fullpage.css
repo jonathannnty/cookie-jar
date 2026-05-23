@@ -75,26 +75,12 @@ html, body {
   min-height: 0;
 }
 
-/* Wooden lid strip */
-.jar-lid {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 50px;
-  flex-shrink: 0;
-}
-.jar-lid img {
-  width: 86%;
-  height: auto;
-  display: block;
-}
-
 /* Scrollable body */
 .jar-body {
   flex: 1;
   min-height: 0;
   display: flex;
-  padding: 0 12px 16px;
+  padding: 12% 12px 6%;
 }
 .jar-scroll {
   flex: 1;
