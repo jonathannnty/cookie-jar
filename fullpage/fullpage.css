@@ -25,7 +25,12 @@ html, body {
   align-items: center;
   gap: 12px;
 }
-.topbar-logo { height: 44px; width: auto; display: block; }
+.topbar-logo {
+  height: 44px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.28));
+}
 .topbar-title {
   font-size: 32px;
   font-weight: 700;
@@ -50,7 +55,16 @@ html, body {
   transition: background 0.12s;
 }
 .topbar-btn:hover { background: rgba(91,74,56,0.12); }
-.topbar-btn svg { width: 30px; height: 30px; display: block; }
+.topbar-btn img {
+  width: 28px;
+  height: 28px;
+  display: block;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.28));
+  transition: filter 0.15s;
+}
+.topbar-btn:hover img {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.52));
+}
 
 /* ─── MAIN TWO-COLUMN LAYOUT ─────────────────── */
 .main {
