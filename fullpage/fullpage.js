@@ -46,8 +46,8 @@ loadAndSync();
 
 // Tab switching for mobile/tablet
 const tabBar = document.getElementById('tabBar');
-if (tabBar) {
-  const main = document.querySelector('.main');
+const main = document.querySelector('.main');
+if (tabBar && main) {
   tabBar.addEventListener('click', e => {
     const btn = e.target.closest('.tab-btn');
     if (!btn) return;
