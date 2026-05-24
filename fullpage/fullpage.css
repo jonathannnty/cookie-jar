@@ -179,7 +179,6 @@ html, body {
   display: block;
   z-index: 2;
   pointer-events: none;
-  transition: opacity 0.35s ease;
 }
 
 .glass-content {
@@ -232,6 +231,7 @@ html, body {
   height: auto;
   flex-shrink: 0;
   margin-top: 2px;
+  animation: float-cookie 3.2s ease-in-out infinite;
 }
 
 .glass-text { flex: 1; min-width: 0; }
@@ -277,10 +277,6 @@ html, body {
 @keyframes float-cookie-unsafe {
   0%, 100% { transform: rotate(6deg) translateY(0px); }
   50%       { transform: rotate(6deg) translateY(-5px); }
-}
-
-.glass-cookie-img {
-  animation: float-cookie 3.2s ease-in-out infinite;
 }
 
 .glass-cookie-img.unsafe-cookie-img {
