@@ -296,18 +296,27 @@ html, body {
   padding: 10px 8px;
   background: transparent;
   border: none;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
+  position: relative;
   font-family: 'Fredoka', 'Trebuchet MS', sans-serif;
   font-size: 16px;
   font-weight: 600;
   color: #8e6f48;
   cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
+  transition: color 0.15s;
 }
 .tab-btn.active {
   color: #5b4a38;
-  border-bottom-color: #8B5A2B;
+}
+.tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 8%;
+  width: 84%;
+  height: 4px;
+  background: #8B5A2B;
+  border-radius: 2px;
+  filter: url('#hd');
 }
 
 /* ─── RESPONSIVE: TABLET / MOBILE (≤900px) ──────── */
@@ -345,7 +354,7 @@ html, body {
   .jar-panel {
     flex: none;
     width: 100%;
-    min-height: 70vh;
+    min-height: 80vh;
     height: auto;
   }
   .jar-body {
@@ -362,21 +371,51 @@ html, body {
   }
   .glass-outer {
     height: auto;
-    width: 80%;
-    max-width: 380px;
+    /* cap width so height never exceeds 85vh: width = 85vh × (450/672) */
+    width: min(90%, calc(85vh * 450 / 672));
     margin: 0 auto;
   }
 }
 
 /* ─── RESPONSIVE: SMALL PHONES (≤480px) ─────────── */
 @media (max-width: 480px) {
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
   .topbar-title {
     font-size: 18px;
   }
+
+  .main {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: 24px 0 0;
+    gap: 0;
+  }
+
+  .jar-panel {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    background-image: url('../figma/svg/FullWebpagePhone-CookieJar.svg');
+  }
+  .jar-body {
+    flex: 1;
+    min-height: 0;
+    padding: 12% 14px 6%;
+  }
+  .jar-scroll {
+    overflow-y: auto;
+  }
+
+  .glass-panel {
+    flex: 1;
+    min-height: 0;
+  }
   .glass-outer {
     width: 95%;
-  }
-  .jar-panel {
-    min-height: 80vh;
   }
 }
