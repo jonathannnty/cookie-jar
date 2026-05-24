@@ -282,3 +282,101 @@ html, body {
 .glass-cookie-img.unsafe-cookie-img {
   animation: float-cookie-unsafe 3.2s ease-in-out infinite;
 }
+
+/* ─── TAB BAR (hidden on desktop) ───────────────── */
+.tab-bar {
+  display: none;
+  flex-shrink: 0;
+  border-bottom: 2px solid rgba(196,168,112,0.35);
+  padding: 0 16px;
+  background: transparent;
+}
+.tab-btn {
+  flex: 1;
+  padding: 10px 8px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-family: 'Fredoka', 'Trebuchet MS', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #8e6f48;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn.active {
+  color: #5b4a38;
+  border-bottom-color: #8B5A2B;
+}
+
+/* ─── RESPONSIVE: TABLET / MOBILE (≤900px) ──────── */
+@media (max-width: 900px) {
+  html, body {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .topbar {
+    padding: 8px 16px;
+  }
+  .topbar-logo {
+    height: 32px;
+  }
+  .topbar-title {
+    font-size: 22px;
+  }
+
+  .tab-bar {
+    display: flex;
+  }
+
+  .main {
+    flex-direction: column;
+    padding: 8px 16px 24px;
+    gap: 16px;
+    overflow: visible;
+  }
+
+  .main[data-active-tab="jar"] .glass-panel { display: none; }
+  .main[data-active-tab="glass"] .jar-panel  { display: none; }
+
+  .jar-panel {
+    flex: none;
+    width: 100%;
+    min-height: 70vh;
+    height: auto;
+  }
+  .jar-body {
+    padding: 10% 12px 6%;
+  }
+  .jar-scroll {
+    overflow-y: visible;
+  }
+
+  .glass-panel {
+    flex: none;
+    width: 100%;
+    height: auto;
+  }
+  .glass-outer {
+    height: auto;
+    width: 80%;
+    max-width: 380px;
+    margin: 0 auto;
+  }
+}
+
+/* ─── RESPONSIVE: SMALL PHONES (≤480px) ─────────── */
+@media (max-width: 480px) {
+  .topbar-title {
+    font-size: 18px;
+  }
+  .glass-outer {
+    width: 95%;
+  }
+  .jar-panel {
+    min-height: 80vh;
+  }
+}
