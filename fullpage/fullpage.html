@@ -83,24 +83,8 @@
   <div class="glass-panel">
     <div class="glass-outer">
 
-      <!-- Animated milk fill (rises as safe categories are enabled) -->
-      <svg class="milk-fill-svg" viewBox="0 0 450 672"
-           preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <defs>
-          <clipPath id="glass-clip">
-            <path d="M3.04589 36.9196C2.67097 30.9688 2.48351 27.9934 3.71553 24.8778C4.66704 22.4716 6.96972 19.5625 9.09317 18.084C11.8426 16.1696 14.3259 15.7465 19.2924 14.9004C94.7977 2.03687 336.98 -3.97235 430.206 14.5126C435.846 15.6309 438.666 16.1901 441.308 18.0883C443.452 19.6285 445.522 22.2783 446.497 24.7315C447.698 27.7552 447.54 30.9765 447.225 37.4192L418.991 613.579C418.416 625.313 418.129 631.181 415.501 636.649C413.382 641.056 409.231 645.846 405.169 648.57C400.13 651.948 395.08 652.928 384.98 654.887C297.367 671.882 142.179 674.896 67.3797 656.01C60.6565 654.313 57.2949 653.464 52.6407 650.102C49.2474 647.652 44.8637 642.375 43.0768 638.59C40.6258 633.398 40.3328 628.749 39.747 619.45L3.04589 36.9196Z"/>
-          </clipPath>
-        </defs>
-        <rect id="milk-fill-rect"
-              x="0" y="15" width="450" height="641"
-              fill="#F2E0B0"
-              clip-path="url(#glass-clip)"
-              transform="translate(0,641)"/>
-      </svg>
-
-      <!-- Glass illustration on top of the fill -->
-      <img class="milk-cup-img" src="../figma/svg/MilkCup.svg"
-           alt="Milk glass — fill level reflects enabled safe cookies">
+      <!-- Dynamic milk level — src swapped by JS based on enabled cookies -->
+      <img class="milk-level-img" id="milkLevelImg" src="" alt="" style="display:none">
 
       <!-- Text content overlaid on the glass -->
       <div class="glass-content">
