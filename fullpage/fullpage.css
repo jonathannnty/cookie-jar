@@ -141,7 +141,7 @@ html, body {
   gap: 10px;
   line-height: 1.2;
 }
-.thumb { font-size: 22px; flex-shrink: 0; line-height: 1; }
+.thumb-img { width: 26px; height: auto; flex-shrink: 0; }
 .section-body {
   font-size: 14px;
   font-weight: 400;
