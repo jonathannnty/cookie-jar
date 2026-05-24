@@ -267,3 +267,22 @@ html, body {
   width: 0;
   height: 0;
 }
+
+/* ─── COOKIE FLOAT ANIMATIONS ───────────────── */
+@keyframes float-cookie {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes float-cookie-unsafe {
+  0%, 100% { transform: rotate(6deg) translateY(0px); }
+  50%       { transform: rotate(6deg) translateY(-5px); }
+}
+
+.glass-cookie-img {
+  animation: float-cookie 3.2s ease-in-out infinite;
+}
+
+.glass-cookie-img.unsafe-cookie-img {
+  animation: float-cookie-unsafe 3.2s ease-in-out infinite;
+}
