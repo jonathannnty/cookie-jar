@@ -43,3 +43,15 @@ document.getElementById('btnSettings')?.addEventListener('click', () => {
 });
 
 loadAndSync();
+
+// Tab switching for mobile/tablet
+const tabBar = document.getElementById('tabBar');
+if (tabBar) {
+  const main = document.querySelector('.main');
+  tabBar.addEventListener('click', e => {
+    const btn = e.target.closest('.tab-btn');
+    if (!btn) return;
+    tabBar.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    main.dataset.activeTab = btn.dataset.tab;
+  });
+}
