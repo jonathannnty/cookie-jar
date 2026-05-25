@@ -17,10 +17,10 @@ html {
 body {
   font-family: var(--font);
   background-color: #bda07c;
-  background-image: url('../figma/svg/CookieJar.png');
+  background-image: url('../figma/svg/CookieJar.svg');
   background-repeat: no-repeat;
-  background-position: center center;
-  background-size: calc(100% - 20px) calc(100% - 20px);
+  background-position: center top;
+  background-size: 100% auto;
   color: var(--c-fg);
   width: 374px;
   height: 353px;
