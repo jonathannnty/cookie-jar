@@ -195,7 +195,11 @@ advBtn.addEventListener('click', () => {
 });
 
 // ── Full page link ─────────────────────────────────────
-document.getElementById('btnFullPage').addEventListener('click', () => {
+document.getElementById('btnFullPage').addEventListener('click', async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (tab?.url?.startsWith('http')) {
+    await chrome.storage.local.set({ _originTabUrl: tab.url });
+  }
   chrome.tabs.create({ url: chrome.runtime.getURL('fullpage/fullpage.html') });
 });
 

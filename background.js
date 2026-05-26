@@ -28,18 +28,60 @@ async function removeCookie(cookie) {
   return result !== null;
 }
 
+async function getCustomRules() {
+  const data = await chrome.storage.local.get('customRules');
+  return data.customRules || { domains: [], maxAgeDays: null, blockedPatterns: [] };
+}
+
+function patternToRegex(pattern) {
+  const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*').replace(/\?/g, '.');
+  return new RegExp('^' + escaped + '$', 'i');
+}
+
+// Returns false to block, true to allow, null to fall back to global prefs.
+function checkCustomRules(cookie, hostname, category, rules) {
+  if (rules.blockedPatterns?.length) {
+    for (const p of rules.blockedPatterns) {
+      if (patternToRegex(p).test(cookie.name)) return false;
+    }
+  }
+  if (rules.maxAgeDays !== null && cookie.expirationDate) {
+    const maxMs = rules.maxAgeDays * 86400 * 1000;
+    if (cookie.expirationDate * 1000 - Date.now() > maxMs) return false;
+  }
+  if (rules.domains?.length) {
+    const rule = rules.domains.find(d => hostname === d.domain || hostname.endsWith('.' + d.domain));
+    if (rule?.overrides?.[category] !== undefined) return rule.overrides[category];
+  }
+  return null;
+}
+
+async function appendBlockedLog(entries) {
+  if (!entries.length) return;
+  const data = await chrome.storage.local.get('blockedLog');
+  const log = data.blockedLog || [];
+  log.push(...entries);
+  if (log.length > 50000) log.splice(0, log.length - 50000);
+  await chrome.storage.local.set({ blockedLog: log });
+}
+
 async function applyPreferences(url) {
   if (!url?.startsWith('http')) return;
   try {
-    const prefs = await getPrefs();
+    const [prefs, rules] = await Promise.all([getPrefs(), getCustomRules()]);
     if (!prefs.autoApply) return;
 
+    const urlObj = new URL(url);
     const cookies = await getClassifiedCookies(url);
+    const blocked = [];
+
     for (const cookie of cookies) {
       const { category } = cookie.classification;
+      const custom = checkCustomRules(cookie, urlObj.hostname, category, rules);
       let allowed;
-
-      if (prefs.mode === 'simple') {
+      if (custom !== null) {
+        allowed = custom;
+      } else if (prefs.mode === 'simple') {
         const needed = CookieClassifier.isNecessaryCategory(category);
         allowed = needed ? prefs.simple.necessary : prefs.simple.optional;
       } else {
@@ -48,11 +90,15 @@ async function applyPreferences(url) {
 
       if (!allowed) {
         const removed = await removeCookie(cookie);
-        if (!removed) {
-          console.warn(`[Cookie Jar] Failed to remove "${cookie.name}" on ${cookie.domain} — check domain/path match`);
+        if (removed) {
+          blocked.push({ ts: Date.now(), domain: urlObj.hostname, category });
+        } else {
+          console.warn(`[Cookie Jar] Failed to remove "${cookie.name}" on ${cookie.domain}`);
         }
       }
     }
+
+    await appendBlockedLog(blocked);
   } catch {
     // silently skip non-http URLs or permission errors
   }
@@ -76,22 +122,28 @@ chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
   if (cause === 'expired' || cause === 'expired_overwrite' || cause === 'evicted') return;
 
   try {
-    const prefs = await getPrefs();
+    const [prefs, rules] = await Promise.all([getPrefs(), getCustomRules()]);
     if (!prefs.autoApply) return;
 
     const domain = cookie.domain.replace(/^\./, '');
     const classification = CookieClassifier.classifyCookie(cookie, domain);
     const { category } = classification;
 
+    const custom = checkCustomRules(cookie, domain, category, rules);
     let allowed;
-    if (prefs.mode === 'simple') {
+    if (custom !== null) {
+      allowed = custom;
+    } else if (prefs.mode === 'simple') {
       const needed = CookieClassifier.isNecessaryCategory(category);
       allowed = needed ? prefs.simple.necessary : prefs.simple.optional;
     } else {
       allowed = prefs.categories[category] !== false;
     }
 
-    if (!allowed) await removeCookie(cookie);
+    if (!allowed) {
+      await removeCookie(cookie);
+      await appendBlockedLog([{ ts: Date.now(), domain: cookie.domain.replace(/^\./, ''), category }]);
+    }
   } catch {
     // best-effort — ignore errors
   }

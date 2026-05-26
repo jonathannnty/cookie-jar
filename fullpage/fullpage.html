@@ -4,11 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Cookie Jar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap"></noscript>
   <link rel="stylesheet" href="fullpage.css">
 </head>
 <body>
 
-<!-- Hand-drawn border filter (shared with popup) -->
+<!-- Hand-drawn border filter -->
 <svg width="0" height="0" class="hd-filter-svg" aria-hidden="true">
   <defs>
     <filter id="hd" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
@@ -18,157 +22,344 @@
   </defs>
 </svg>
 
+<svg class="table-bg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1280 165" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <clipPath id="table-clip">
+      <path d="M0 13.9858C496.401 -3.69179 776.646 -3.87726 1280 13.9858V164.658H0V13.9858Z"/>
+    </clipPath>
+  </defs>
+  <path d="M0 13.9858C496.401 -3.69179 776.646 -3.87726 1280 13.9858V164.658H0V13.9858Z" fill="#A6723A"/>
+  <image href="../natural-wood-texture-background-surface-of-teak-wooden-desk-texture-free-photo.jpg" x="0" y="0" width="1280" height="165" clip-path="url(#table-clip)" opacity="0.2" preserveAspectRatio="xMidYMid slice"/>
+  <path d="M0 13.9858C496.401 -3.69179 776.646 -3.87726 1280 13.9858V164.658H0V13.9858Z" fill="none" stroke="#675848" stroke-width="1.31602"/>
+</svg>
+
 <!-- ══ TOPBAR ══════════════════════════════════════════ -->
 <header class="topbar">
   <div class="topbar-left">
-    <img class="topbar-logo" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar">
-    <span class="topbar-title">Cookie Jar</span>
+    <img class="topbar-logo" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar" width="48" height="48" fetchpriority="high">
+    <div class="topbar-title-group">
+      <span class="topbar-title">Cookie Jar</span>
+      <span class="topbar-version">v1.00.0</span>
+    </div>
   </div>
   <div class="topbar-right">
-    <!-- Back arrow -->
     <button class="topbar-btn" id="btnBack" title="Back">
-      <img src="../figma/svg/Back.svg" alt="Back">
+      <img src="../figma/svg/Back.svg" alt="Back" width="32" height="32">
     </button>
-    <!-- Settings gear -->
+    <button class="topbar-btn" id="btnHome" title="Information">
+      <img src="../figma/svg/Home.svg" alt="Home" width="32" height="32">
+    </button>
+    <button class="topbar-btn" id="btnStats" title="Statistics">
+      <img src="../figma/svg/Stats.svg" alt="Statistics" width="32" height="32">
+    </button>
+    <button class="topbar-btn" id="btnCustomize" title="Customize">
+      <img src="../figma/svg/Customize.svg" alt="Customize" width="32" height="32">
+    </button>
     <button class="topbar-btn" id="btnSettings" title="Settings">
-      <img src="../figma/svg/Settings.svg" alt="Settings">
+      <img src="../figma/svg/Settings.svg" alt="Settings" width="32" height="32">
     </button>
   </div>
 </header>
 
-<!-- ══ TAB BAR (mobile/tablet only) ══════════════════════ -->
-<nav class="tab-bar" id="tabBar">
-  <button class="tab-btn active" data-tab="jar">Cookie Jar</button>
-  <button class="tab-btn" data-tab="glass">Milk Glass</button>
-</nav>
-
 <!-- ══ MAIN LAYOUT ═════════════════════════════════════ -->
-<main class="main" data-active-tab="jar">
+<div class="main-wrapper">
+<main class="main" id="mainContent">
+  <div class="info-column">
 
-  <!-- ── LEFT: COOKIE JAR ─────────────────────────── -->
-  <div class="jar-panel">
+    <!-- Intro card -->
+    <div class="info-card">
+      <h1 class="card-title">Tailor your cookies!</h1>
+      <p class="card-body">Cookies are small bits of data stored in your browser that help websites remember things like your login, preferences, and settings to create a smoother browsing experience.</p>
+      <p class="card-body">But not all cookies are harmless — some are used to track your activity across websites, collect personal data, and build detailed profiles for advertising and analytics.</p>
+      <p class="card-body">With Cookie Jar, you can manage your cookie preferences at a glance, and set your default preferences so you don't have to choose between convenience and privacy.</p>
+    </div>
 
-    <!-- Scrollable content area -->
-    <div class="jar-body">
-      <div class="jar-scroll">
-
-        <h1 class="intro-title">Tailor your cookies!</h1>
-        <p class="intro-body">Cookies are small bits of data stored in your browser that help websites remember things like your login, preferences, and settings to create a smoother browsing experience.</p>
-        <p class="intro-body">But not all cookies are harmless — some are used to track your activity across websites, collect personal data, and build detailed profiles for advertising and analytics.</p>
-        <p class="intro-body">With Cookie Jar, you can manage your cookie preferences at a glance, and set your default preferences so you don't have to choose between convenience and privacy.</p>
-
-        <!-- Session Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Session Cookies <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt=""></h2>
-          <p class="section-body">Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.</p>
+    <!-- Safe vs Unsafe card -->
+    <div class="info-card">
+      <h2 class="card-title">Safe vs. Unsafe Cookies</h2>
+      <div class="card-two-col">
+        <div class="card-col">
+          <div class="card-col-heading">
+            <img class="card-cookie-img" src="../figma/svg/SafeCookie.svg" alt="" width="32" height="32">
+            <span>Safe Cookies</span>
+          </div>
+          <ul class="card-list">
+            <li>Protect user privacy</li>
+            <li>Keep users logged in securely</li>
+            <li>Improve website functionality</li>
+            <li>Usually temporary or limited-use</li>
+            <li>Only used by the website you visit</li>
+            <li>Collect minimal personal data</li>
+            <li>Support safer browsing experiences</li>
+          </ul>
+          <p class="card-includes">Includes session &amp; authentication</p>
         </div>
-
-        <!-- Authentication Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Authentication Cookies <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt=""></h2>
-          <p class="section-body">Authentication cookies help websites know that you're logged in. They store a secure ID so you can stay signed in while browsing without entering your password on every page.</p>
+        <div class="card-col">
+          <div class="card-col-heading">
+            <img class="card-cookie-img unsafe-cookie-img" src="../figma/svg/UnsafeCookie.svg" alt="" width="32" height="32">
+            <span>Unsafe Cookies</span>
+          </div>
+          <ul class="card-list">
+            <li>Track browsing activity across websites</li>
+            <li>Collect excessive personal data</li>
+            <li>Used for targeted advertising</li>
+            <li>Monitor user behavior and habits</li>
+            <li>May sell or distribute user data</li>
+            <li>Increase risk of data misuse or leaks</li>
+          </ul>
+          <p class="card-includes">Includes tracking &amp; third-party</p>
         </div>
-
-        <!-- Tracking Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Tracking Cookies <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt=""></h2>
-          <p class="section-body">Tracking cookies follow your activity across websites to collect data about your behavior, interests, and browsing habits — often to personalize ads and analytics.</p>
-        </div>
-
-        <!-- Third-Party Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Third-Party Cookies <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt=""></h2>
-          <p class="section-body">Third-party cookies are set by websites other than the one you're currently visiting. They're commonly used for cross-site tracking, targeted advertising, and embedded content like social media buttons.</p>
-        </div>
-
-        <!-- Analytics Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Analytics Cookies <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt=""></h2>
-          <p class="section-body">Analytics cookies measure how you interact with a website — which pages you visit, how long you stay, and what you click. While site owners use this data to improve their product, many analytics tools also aggregate your behavior into profiles that can be shared or sold.</p>
-        </div>
-
-        <!-- Advertising Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Advertising Cookies <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt=""></h2>
-          <p class="section-body">Advertising cookies follow your browsing habits across sites to build a profile of your interests and serve you targeted ads. They are typically placed by ad networks, not the site you're visiting, and can track you even after you leave.</p>
-        </div>
-
-        <!-- Functional Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Functional Cookies <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt=""></h2>
-          <p class="section-body">Functional cookies remember your preferences — like your chosen language, region, or layout — to give you a more personalized experience. Unlike tracking cookies, they typically stay within the site you're visiting and don't follow you elsewhere.</p>
-        </div>
-
-        <!-- Unknown Cookies -->
-        <div class="cookie-section">
-          <h2 class="section-heading">Unknown Cookies <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt=""></h2>
-          <p class="section-body">Unknown cookies don't match any recognized category — they may come from third-party scripts, plugins, or services whose purpose hasn't been identified. Since their intent is unclear, it's generally safer to block them until you know what they're doing.</p>
-        </div>
-
       </div>
     </div>
-  </div><!-- .jar-panel -->
 
-  <!-- ── RIGHT: MILK GLASS ─────────────────────────── -->
-  <div class="glass-panel">
-    <div class="glass-outer">
+    <!-- Cookie section cards -->
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26">
+        Session Cookies
+      </h2>
+      <p class="card-body">Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.</p>
+      <p class="card-examples"><strong>e.g.</strong> Amazon keeps your shopping cart intact while you browse; YouTube remembers your video position within a single visit.</p>
+    </div>
 
-      <!-- Dynamic milk level — src swapped by JS based on enabled cookies -->
-      <img class="milk-level-img" id="milkLevelImg" alt="" style="display:none">
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26">
+        Authentication Cookies
+      </h2>
+      <p class="card-body">Authentication cookies help websites know that you're logged in. They store a secure ID so you can stay signed in while browsing without entering your password on every page.</p>
+      <p class="card-examples"><strong>e.g.</strong> Google keeps you signed in across Gmail, Drive, and Docs; Spotify remembers your account as you navigate between pages.</p>
+    </div>
 
-      <!-- Text content overlaid on the glass -->
-      <div class="glass-content">
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        Tracking Cookies
+      </h2>
+      <p class="card-body">Tracking cookies follow your activity across websites to collect data about your behavior, interests, and browsing habits — often to personalize ads and analytics.</p>
+      <p class="card-examples"><strong>e.g.</strong> The Facebook Pixel records pages you visit so Facebook can retarget you with ads; Google's ad network tracks searches and site visits across millions of websites.</p>
+    </div>
 
-        <!-- Title in the rim area -->
-        <div class="glass-title-area">
-          <h2 class="glass-title">Safe vs. Unsafe<br>Cookies</h2>
-        </div>
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        Third-Party Cookies
+      </h2>
+      <p class="card-body">Third-party cookies are set by websites other than the one you're currently visiting. They're commonly used for cross-site tracking, targeted advertising, and embedded content like social media buttons.</p>
+      <p class="card-examples"><strong>e.g.</strong> A Facebook "Like" button on a news site sets a cookie from facebook.com; a Google Maps embed on a restaurant's page sets cookies from google.com.</p>
+    </div>
 
-        <!-- Safe + Unsafe sections in the glass body -->
-        <div class="glass-body">
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        Analytics Cookies
+      </h2>
+      <p class="card-body">Analytics cookies measure how you interact with a website — which pages you visit, how long you stay, and what you click. While site owners use this data to improve their product, many analytics tools also aggregate your behavior into profiles that can be shared or sold.</p>
+      <p class="card-examples"><strong>e.g.</strong> Google Analytics tracks page views and session duration on most websites; Hotjar records click heatmaps and session replays to study user behavior.</p>
+    </div>
 
-          <!-- Safe Cookies -->
-          <div class="glass-section">
-            <img class="glass-cookie-img" src="../figma/svg/SafeCookie.svg" alt="Safe cookie">
-            <div class="glass-text">
-              <div class="glass-section-name">Safe Cookies</div>
-              <ul class="glass-list">
-                <li>Protect user privacy</li>
-                <li>Keep users logged in securely</li>
-                <li>Improve website functionality</li>
-                <li>Usually temporary or limited-use</li>
-                <li>Only used by the website you visit</li>
-                <li>Collect minimal personal data</li>
-                <li>Support safer browsing experiences</li>
-              </ul>
-              <p class="glass-includes">Includes session &amp; authentication</p>
-            </div>
-          </div>
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        Advertising Cookies
+      </h2>
+      <p class="card-body">Advertising cookies follow your browsing habits across sites to build a profile of your interests and serve you targeted ads. They are typically placed by ad networks, not the site you're visiting, and can track you even after you leave.</p>
+      <p class="card-examples"><strong>e.g.</strong> Google AdSense tailors banner ads based on your search and browsing history; Meta's Pixel shows you Facebook ads for products you viewed on other sites.</p>
+    </div>
 
-          <!-- Unsafe Cookies -->
-          <div class="glass-section">
-            <img class="glass-cookie-img unsafe-cookie-img" src="../figma/svg/UnsafeCookie.svg" alt="Unsafe cookie">
-            <div class="glass-text">
-              <div class="glass-section-name">Unsafe Cookies</div>
-              <ul class="glass-list">
-                <li>Track browsing activity across websites</li>
-                <li>Collect excessive personal data</li>
-                <li>Used for targeted advertising</li>
-                <li>Monitor user behavior and habits</li>
-                <li>May sell or distribute user data</li>
-                <li>Increase risk of data misuse or leaks</li>
-              </ul>
-              <p class="glass-includes">Includes tracking &amp; third-party</p>
-            </div>
-          </div>
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26">
+        Functional Cookies
+      </h2>
+      <p class="card-body">Functional cookies remember your preferences — like your chosen language, region, or layout — to give you a more personalized experience. Unlike tracking cookies, they typically stay within the site you're visiting and don't follow you elsewhere.</p>
+      <p class="card-examples"><strong>e.g.</strong> Netflix saves your preferred language and subtitle settings; X (Twitter) remembers whether you prefer dark or light mode.</p>
+    </div>
 
-        </div>
-      </div><!-- .glass-content -->
+    <div class="info-card">
+      <h2 class="card-section-heading">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        Unknown Cookies
+      </h2>
+      <p class="card-body">Unknown cookies don't match any recognized category — they may come from third-party scripts, plugins, or services whose purpose hasn't been identified. Since their intent is unclear, it's generally safer to block them until you know what they're doing.</p>
+      <p class="card-examples"><strong>e.g.</strong> A live chat widget, A/B testing script, or affiliate tracking pixel whose origin or data usage isn't clearly disclosed by the site.</p>
+    </div>
 
-    </div><!-- .glass-outer -->
-  </div><!-- .glass-panel -->
-
+  </div>
 </main>
+</div><!-- .main-wrapper -->
+
+<!-- ══ STATS PANEL ═══════════════════════════════════════ -->
+<div id="statsPanel" class="stats-panel fp-hidden">
+  <div class="info-card stats-card">
+
+    <div class="stats-header">
+      <div class="stats-headline">
+        <h2 class="stats-title">Cookie Statistics</h2>
+        <p class="stats-count" id="statsCount">— cookies blocked</p>
+      </div>
+      <div class="stats-controls">
+        <div class="stats-type-btns">
+          <button class="stats-btn active" data-type="bar">By Website</button>
+          <button class="stats-btn" data-type="line">Over Time</button>
+        </div>
+        <div class="stats-period-btns">
+          <button class="stats-btn active" data-period="today">Today</button>
+          <button class="stats-btn" data-period="week">Week</button>
+          <button class="stats-btn" data-period="month">Month</button>
+          <button class="stats-btn" data-period="year">Year</button>
+          <button class="stats-btn" data-period="all">All Time</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-chart-area">
+      <canvas id="statsCanvas"></canvas>
+      <p class="stats-empty" id="statsEmpty">No cookies blocked yet — browse a few sites and come back.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ CUSTOMIZE PANEL ════════════════════════════════════ -->
+<div id="customizePanel" class="customize-panel fp-hidden">
+  <div class="info-card customize-card">
+
+    <div class="stats-header">
+      <div class="stats-headline">
+        <h2 class="stats-title">Customize Rules</h2>
+        <p class="stats-count" id="custRuleCount">— rules active</p>
+      </div>
+    </div>
+
+    <div class="cust-body">
+
+      <div class="cust-section">
+        <h3 class="cust-section-title">Per-Domain Rules</h3>
+        <p class="cust-section-desc">Override global preferences for specific sites — for example, allow analytics on a trusted site but block it everywhere else.</p>
+        <div class="cust-input-row">
+          <input type="text" class="cust-input" id="custDomainInput" placeholder="e.g. example.com">
+          <button class="cust-add-btn" id="custAddDomain">Add</button>
+        </div>
+        <div class="cust-domain-list" id="custDomainList"></div>
+      </div>
+
+      <div class="cust-section">
+        <h3 class="cust-section-title">Block Persistent Cookies</h3>
+        <p class="cust-section-desc">Block any cookie that persists longer than the chosen number of days, regardless of its category.</p>
+        <div class="cust-persist-row">
+          <label class="cust-persist-toggle">
+            <input type="checkbox" id="custPersistToggle">
+            <span class="cust-persist-switch"></span>
+          </label>
+          <span class="cust-persist-label">Block cookies expiring beyond</span>
+          <input type="number" class="cust-days-input" id="custMaxDays" value="30" min="1" max="3650">
+          <span class="cust-persist-label">days</span>
+        </div>
+      </div>
+
+      <div class="cust-section">
+        <h3 class="cust-section-title">Block by Cookie Name</h3>
+        <p class="cust-section-desc">Block cookies whose names match a pattern. Use <code>*</code> as a wildcard — e.g. <code>_ga*</code> blocks <code>_ga</code>, <code>_ga_abc</code>, and any other name starting with <code>_ga</code>.</p>
+        <div class="cust-presets" id="custPresets"></div>
+        <div class="cust-input-row" style="margin-top:10px">
+          <input type="text" class="cust-input" id="custPatternInput" placeholder="Custom pattern, e.g. my_cookie*">
+          <button class="cust-add-btn" id="custAddPattern">Add</button>
+        </div>
+        <div class="cust-custom-patterns" id="custCustomPatterns"></div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ SETTINGS MODAL ════════════════════════════════════ -->
+<div id="settingsOverlay" class="fp-settings-overlay fp-hidden" role="dialog" aria-modal="true" aria-label="Settings">
+  <div class="fp-settings-modal">
+
+    <h2 class="fp-settings-title">Settings</h2>
+
+    <button class="fp-settings-close" id="btnSettingsClose" aria-label="Close settings">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/>
+      </svg>
+    </button>
+
+    <div class="fp-settings-body">
+      <h3 class="fp-settings-subtitle">Set Your Cookie Preferences</h3>
+
+      <div class="fp-settings-grid">
+        <div class="fp-toggle-row">
+          <label class="fp-toggle" data-flavor="choc">
+            <input type="checkbox" data-cat="session">
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-choc.svg" alt=""></div></div>
+          </label>
+          <span class="fp-toggle-label">Session Cookies</span>
+        </div>
+        <div class="fp-toggle-row">
+          <label class="fp-toggle" data-flavor="mm">
+            <input type="checkbox" data-cat="tracking">
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-mm.svg" alt=""></div></div>
+          </label>
+          <span class="fp-toggle-label">Tracking Cookies</span>
+        </div>
+        <div class="fp-toggle-row">
+          <label class="fp-toggle" data-flavor="matcha">
+            <input type="checkbox" data-cat="authentication">
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div></div>
+          </label>
+          <span class="fp-toggle-label">Authentication Cookies</span>
+        </div>
+        <div class="fp-toggle-row">
+          <label class="fp-toggle" data-flavor="redvelvet">
+            <input type="checkbox" data-cat="third-party">
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div></div>
+          </label>
+          <span class="fp-toggle-label">Third-Party Cookies</span>
+        </div>
+      </div>
+
+      <button class="fp-adv-btn" id="fpAdvBtn">
+        Advanced Settings <span class="fp-chevron">▲</span>
+      </button>
+
+      <div class="fp-adv-section" id="fpAdvSection">
+        <div class="fp-settings-grid">
+          <div class="fp-toggle-row">
+            <label class="fp-toggle" data-flavor="matcha">
+              <input type="checkbox" data-cat="analytics">
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div></div>
+            </label>
+            <span class="fp-toggle-label">Analytics Cookies</span>
+          </div>
+          <div class="fp-toggle-row">
+            <label class="fp-toggle" data-flavor="redvelvet">
+              <input type="checkbox" data-cat="advertising">
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div></div>
+            </label>
+            <span class="fp-toggle-label">Advertising Cookies</span>
+          </div>
+          <div class="fp-toggle-row">
+            <label class="fp-toggle" data-flavor="choc">
+              <input type="checkbox" data-cat="functional">
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-choc.svg" alt=""></div></div>
+            </label>
+            <span class="fp-toggle-label">Functional Cookies</span>
+          </div>
+          <div class="fp-toggle-row">
+            <label class="fp-toggle" data-flavor="mm">
+              <input type="checkbox" data-cat="unknown">
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-mm.svg" alt=""></div></div>
+            </label>
+            <span class="fp-toggle-label">Unknown Cookies</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
 
 <script src="../utils/cookie-classifier.js"></script>
 <script src="../utils/prefs.js"></script>
