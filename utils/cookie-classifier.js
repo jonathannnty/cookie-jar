@@ -103,6 +103,26 @@ const CookieClassifier = (() => {
       /^wordpress_logged_in/, /^wp[-_]settings/,
       /^ASP\.NET_SessionId$/, /^__RequestVerificationToken$/,
       /^_session(_id)?$/i, /^session$/i,
+      // Google account / OAuth — SID family and __Secure- prefixed variants
+      /^SID$/, /^HSID$/, /^SSID$/, /^LSID$/, /^APISID$/, /^SAPISID$/,
+      /^__Secure-1PSID$/, /^__Secure-3PSID$/,
+      /^__Secure-1PAPISID$/, /^__Secure-3PAPISID$/,
+      /^__Secure-1PSIDTS$/, /^__Secure-3PSIDTS$/,
+      /^__Secure-1PSIDCC$/, /^__Secure-3PSIDCC$/,
+      /^__Secure-SSID$/, /^__Secure-APISID$/, /^__Secure-SAPISID$/,
+      /^NID$/, /^1P_JAR$/, /^SOCS$/,
+      // Microsoft / Azure AD auth
+      /^ESCTX$/, /^STSSERVICECOOKIE$/, /^buid$/, /^fpc$/,
+      /^MSPAuth$/, /^MSPProf$/, /^MSNRPCAuth$/,
+      /^OIDCAuthCookie$/, /^AzureAppProxyAnalyticCookie$/,
+      // GitHub auth
+      /^user_session$/, /^__Host-user_session_same_site$/,
+      /^_gh_sess$/, /^dotcom_user$/, /^_device_id$/,
+      // Apple Sign In
+      /^myacinfo$/, /^itctx$/, /^acn01$/, /^dslang$/, /^aidsp$/,
+      // Generic OAuth / OIDC state cookies
+      /^oauth[-_]state$/i, /^oauth[-_]nonce$/i,
+      /^oidc[-_]nonce$/i, /^oidc[-_]state$/i, /^pkce[-_]verifier$/i,
     ],
     advertising: [
       /^IDE$/, /^DSID$/, /^test_cookie$/, /^__gads$/, /^__gpi$/,

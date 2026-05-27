@@ -3,6 +3,47 @@
 importScripts('./utils/cookie-classifier.js');
 importScripts('./utils/prefs.js');
 
+// ── OAuth / Identity-Provider passlist ───────────────────────────────────────
+// These domains exist solely for authentication. Any interference (cookie
+// deletion or consent CSS) breaks OAuth flows with ERR_TOO_MANY_REDIRECTS.
+const OAUTH_PASSLIST = new Set([
+  'accounts.google.com',
+  'login.microsoftonline.com',
+  'login.live.com',
+  'account.live.com',
+  'login.windows.net',
+  'account.microsoft.com',
+  'accounts.microsoft.com',
+  'appleid.apple.com',
+  'auth.apple.com',
+  'idmsa.apple.com',
+  'gsa.apple.com',
+  'auth.atlassian.com',
+  'id.atlassian.com',
+  'login.atlassian.net',
+  'login.salesforce.com',
+  'identity.salesforce.com',
+  'auth.services.mozilla.com',
+  'accounts.firefox.com',
+]);
+
+// Any subdomain of these is also exempt.
+const OAUTH_PASSLIST_SUFFIXES = [
+  '.okta.com', '.oktapreview.com',
+  '.auth0.com',
+  '.onelogin.com',
+  '.pingidentity.com',
+  '.duosecurity.com', '.duo.com',
+  '.forgerock.io', '.forgerock.com',
+];
+
+function isOAuthDomain(hostname) {
+  if (!hostname) return false;
+  const h = hostname.toLowerCase();
+  if (OAUTH_PASSLIST.has(h)) return true;
+  return OAUTH_PASSLIST_SUFFIXES.some(s => h === s.slice(1) || h.endsWith(s));
+}
+
 // ── Consent banner CSS — injected at USER origin (beats all author !important) ──
 // User-origin !important cannot be overridden by any author-origin CSS or JS
 // inline style, making this immune to CMP re-show loops.
@@ -222,10 +263,12 @@ async function appendBlockedLog(entries) {
 async function applyPreferences(url, tabId) {
   if (!url?.startsWith('http')) return;
   try {
+    const urlObj = new URL(url);
+    if (isOAuthDomain(urlObj.hostname)) return;
+
     const [prefs, rules, paused] = await Promise.all([getPrefs(), getCustomRules(), getPausedDomains()]);
     if (!prefs.autoApply) return;
 
-    const urlObj = new URL(url);
     if (paused.has(urlObj.hostname)) return;
 
     const cookies = await getClassifiedCookies(url);
@@ -275,10 +318,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     clearBadge(tabId);
   }
   if (changeInfo.status === 'complete' && tab.url) {
-    applyPreferences(tab.url, tabId);
-    // Belt-and-suspenders: re-inject after full load for lazy CMPs.
-    if (tab.url.startsWith('http')) {
-      injectConsentCSS(tabId);
+    let oauthPage = false;
+    try { oauthPage = isOAuthDomain(new URL(tab.url).hostname); } catch (_) {}
+    if (!oauthPage) {
+      applyPreferences(tab.url, tabId);
+      if (tab.url.startsWith('http')) injectConsentCSS(tabId);
     }
   }
 });
@@ -291,6 +335,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 chrome.webNavigation.onCommitted.addListener(({ tabId, url, frameId }) => {
   if (frameId !== 0) return; // main frame only
   if (!url.startsWith('http')) return;
+  try { if (isOAuthDomain(new URL(url).hostname)) return; } catch (_) { return; }
   injectConsentCSS(tabId);
 });
 
@@ -308,6 +353,7 @@ chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
     if (!prefs.autoApply) return;
 
     const domain = cookie.domain.replace(/^\./, '');
+    if (isOAuthDomain(domain)) return;
     if (paused.has(domain)) return;
 
     const classification = CookieClassifier.classifyCookie(cookie, domain);
