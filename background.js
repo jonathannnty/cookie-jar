@@ -3,11 +3,156 @@
 importScripts('./utils/cookie-classifier.js');
 importScripts('./utils/prefs.js');
 
-async function getPrefs() {
-  const data = await chrome.storage.local.get('preferences');
-  return CookiePrefs.mergePrefs(data.preferences);
+// ── Consent banner CSS — injected at USER origin (beats all author !important) ──
+// User-origin !important cannot be overridden by any author-origin CSS or JS
+// inline style, making this immune to CMP re-show loops.
+const CONSENT_BANNER_SELECTORS = [
+  '#cookie-consent-banner','#cookie-consent','#cookieConsent','#cookie-banner',
+  '#cookieBanner','#cookie-notice','#cookieNotice','#cookie-bar','#cookiebar',
+  '.cookie-consent-banner','.cookie-consent','.cookie-banner','.cookie-notice','.cookie-bar',
+  '[id*="cookie-consent"]','[id*="cookie_consent"]',
+  '[class*="cookie-consent"]','[class*="cookie_consent"]',
+  // OneTrust
+  '#onetrust-consent-sdk','#onetrust-banner-sdk','#onetrust-pc-sdk','#onetrust-pc-btn-handler',
+  '#ot-sdk-btn-floating','.ot-floating-button','#ot-floating-button__open',
+  // CookieBot
+  '#CybotCookiebotDialog','#CybotCookiebotDialogBodyUnderlay',
+  // CookieYes
+  '#cookie-law-info-bar','#cky-consent','.cky-consent-container',
+  '#cky-btn-revisit','.cky-btn-revisit',
+  // Quantcast
+  '#qc-cmp2-container','#qc-cmp2-ui',
+  // SourcePoint
+  '.sp-message-container',
+  // Didomi
+  '.didomi-popup-container','#didomi-host',
+  // Usercentrics
+  '#usercentrics-root',
+  // cc-cookie
+  '.cc-window','#cc--main','#cookiebanner',
+  // TrustArc
+  '#truste-consent-track','#truste-show-consent','#truste-frame',
+  '#consent_blackbar','.truste_overlay','.truste_box_overlay',
+  // Ketch — banner + inner light-DOM children
+  'ketch-consent','#ketch-consent','#ketch-banner','#ketch-consent-banner',
+  '[id*="ketch"]','[class*="ketch-module"]','[class*="ketch-consent"]',
+  // Shopify Customer Privacy
+  'shopify-pc-banner','#shopify-pc-banner','#shopify-pc__banner',
+  '#shopify-pc-modal','#shopify-pc__modal','shopify-consent-tracking-api',
+  '[id*="shopify-pc"]','[id*="shopify-pc__"]','[class*="shopify-pc"]',
+  // Termly
+  '#termly-code-snippet-support','[id*="termly"]',
+  // Evidon / Ghostery
+  '#_evidon_banner','#evidon-barrier-overlay','.evidon-banner',
+  // Iubenda
+  '#iubenda-cs-banner','.iubenda-cs-container','[id*="iubenda"]',
+  // Osano
+  '.osano-cm-window','.osano-cm-dialog','#osano-cm-window',
+  // Complianz
+  '#cmplz-cookiebanner-container','.cmplz-cookiebanner',
+  // Moove GDPR
+  '#moove_gdpr_cookie_modal','#moove_gdpr_cookie_info_bar',
+  // Borlabs
+  '#BorlabsCookie','.borlabs-cookie',
+  // CookieHub
+  '#ch2','.ch2-container','#cookiehub',
+  // Civic
+  '#ccc','.ccc-alert',
+  // Cookie Notice (WP)
+  '.cn-notice-container','#cookie-notice-container',
+  // Le Monde / custom Didomi
+  '[class*="gdpr-lmd"]',
+  // Generic catch-alls
+  '[id*="privacy-banner"]','[id*="privacy-overlay"]',
+  '[id*="consent-banner"]','[id*="consent-modal"]','[id*="consent-dialog"]',
+  '[class*="consent-modal"]','[class*="consent-dialog"]','[class*="consent-overlay"]',
+  '[class*="consent-popup"]',
+  '[class*="cookie-modal"]','[class*="cookie-overlay"]','[class*="cookie-popup"]',
+  '[class*="cookie-banner"]','[class*="cookie-wall"]',
+  '[id*="gdpr"]','[class*="gdpr"]',
+];
+
+const HIDE_PROPS = 'display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;';
+const CONSENT_BANNER_CSS =
+  CONSENT_BANNER_SELECTORS.join(',\n') + '{' + HIDE_PROPS + '}\n' +
+  CONSENT_BANNER_SELECTORS.map(s => ':root ' + s).join(',\n') + '{' + HIDE_PROPS + '}';
+
+async function injectConsentCSS(tabId) {
+  try {
+    await chrome.scripting.insertCSS({
+      target: { tabId, allFrames: false },
+      css: CONSENT_BANNER_CSS,
+      origin: 'USER',
+    });
+  } catch (_) { /* tab may not be injectable (chrome://, extension pages, etc.) */ }
 }
 
+// ── Per-tab blocked-cookie counts (in-memory, cleared on navigation) ──────
+const tabBlockedCounts = new Map();
+
+function updateBadge(tabId, count) {
+  if (!tabId) return;
+  const text = count > 0 ? (count > 999 ? '999+' : String(count)) : '';
+  chrome.action.setBadgeText({ text, tabId });
+  chrome.action.setBadgeBackgroundColor({ color: '#665747', tabId });
+}
+
+function incrementBadge(tabId, amount) {
+  if (!tabId || !amount) return;
+  const prev = tabBlockedCounts.get(tabId) || 0;
+  const next = prev + amount;
+  tabBlockedCounts.set(tabId, next);
+  updateBadge(tabId, next);
+}
+
+function clearBadge(tabId) {
+  tabBlockedCounts.delete(tabId);
+  try { updateBadge(tabId, 0); } catch (_) {}
+}
+
+// ── Storage helpers (prefs + customRules use sync; logs stay local) ────────
+async function getPrefs() {
+  try {
+    const sync = await chrome.storage.sync.get('preferences');
+    if (sync.preferences) return CookiePrefs.mergePrefs(sync.preferences);
+    const local = await chrome.storage.local.get('preferences');
+    if (local.preferences) {
+      await chrome.storage.sync.set({ preferences: local.preferences });
+    }
+    return CookiePrefs.mergePrefs(local.preferences);
+  } catch {
+    return CookiePrefs.mergePrefs(null);
+  }
+}
+
+async function getCustomRules() {
+  try {
+    const sync = await chrome.storage.sync.get('customRules');
+    if (sync.customRules) return sync.customRules;
+    const local = await chrome.storage.local.get('customRules');
+    if (local.customRules) {
+      await chrome.storage.sync.set({ customRules: local.customRules });
+    }
+    return local.customRules || { domains: [], maxAgeDays: null, blockedPatterns: [] };
+  } catch {
+    return { domains: [], maxAgeDays: null, blockedPatterns: [] };
+  }
+}
+
+async function getPausedDomains() {
+  try {
+    const data = await chrome.storage.sync.get('pausedDomains');
+    return new Set(data.pausedDomains || []);
+  } catch {
+    return new Set();
+  }
+}
+
+async function setPausedDomains(set) {
+  await chrome.storage.sync.set({ pausedDomains: [...set] });
+}
+
+// ── Cookie helpers ─────────────────────────────────────────────────────────
 async function getClassifiedCookies(url) {
   try {
     const urlObj = new URL(url);
@@ -26,11 +171,6 @@ async function removeCookie(cookie) {
   const domain = cookie.domain.startsWith('.') ? cookie.domain.slice(1) : cookie.domain;
   const result = await chrome.cookies.remove({ url: `${scheme}://${domain}${cookie.path}`, name: cookie.name });
   return result !== null;
-}
-
-async function getCustomRules() {
-  const data = await chrome.storage.local.get('customRules');
-  return data.customRules || { domains: [], maxAgeDays: null, blockedPatterns: [] };
 }
 
 function patternToRegex(pattern) {
@@ -65,13 +205,16 @@ async function appendBlockedLog(entries) {
   await chrome.storage.local.set({ blockedLog: log });
 }
 
-async function applyPreferences(url) {
+// ── Core apply logic ───────────────────────────────────────────────────────
+async function applyPreferences(url, tabId) {
   if (!url?.startsWith('http')) return;
   try {
-    const [prefs, rules] = await Promise.all([getPrefs(), getCustomRules()]);
+    const [prefs, rules, paused] = await Promise.all([getPrefs(), getCustomRules(), getPausedDomains()]);
     if (!prefs.autoApply) return;
 
     const urlObj = new URL(url);
+    if (paused.has(urlObj.hostname)) return;
+
     const cookies = await getClassifiedCookies(url);
     const blocked = [];
 
@@ -92,40 +235,68 @@ async function applyPreferences(url) {
         const removed = await removeCookie(cookie);
         if (removed) {
           blocked.push({ ts: Date.now(), domain: urlObj.hostname, category });
-        } else {
-          console.warn(`[Cookie Jar] Failed to remove "${cookie.name}" on ${cookie.domain}`);
         }
       }
     }
 
-    await appendBlockedLog(blocked);
+    if (blocked.length) {
+      await appendBlockedLog(blocked);
+      incrementBadge(tabId, blocked.length);
+    }
   } catch {
     // silently skip non-http URLs or permission errors
   }
 }
 
+// ── Lifecycle ──────────────────────────────────────────────────────────────
 chrome.runtime.onInstalled.addListener(async (details) => {
   if (details.reason === 'install') {
-    await chrome.storage.local.set({ preferences: CookiePrefs.DEFAULT_PREFS });
-    chrome.tabs.create({ url: chrome.runtime.getURL('onboarding/onboarding.html') });
+    await chrome.storage.sync.set({ preferences: CookiePrefs.DEFAULT_PREFS });
+    chrome.tabs.create({ url: chrome.runtime.getURL('fullpage/fullpage.html') });
   }
 });
 
+// ── Tab events ─────────────────────────────────────────────────────────────
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'loading') {
+    clearBadge(tabId);
+  }
   if (changeInfo.status === 'complete' && tab.url) {
-    applyPreferences(tab.url);
+    applyPreferences(tab.url, tabId);
+    // Belt-and-suspenders: re-inject after full load for lazy CMPs.
+    if (tab.url.startsWith('http')) {
+      injectConsentCSS(tabId);
+    }
   }
 });
 
+// ── Consent CSS injection via webNavigation ────────────────────────────────
+// onCommitted fires when Chrome commits a navigation — the document object
+// exists but no HTML has been parsed yet. This is the earliest point at which
+// insertCSS can succeed, giving USER-origin rules priority over everything
+// the page loads afterwards.
+chrome.webNavigation.onCommitted.addListener(({ tabId, url, frameId }) => {
+  if (frameId !== 0) return; // main frame only
+  if (!url.startsWith('http')) return;
+  injectConsentCSS(tabId);
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  tabBlockedCounts.delete(tabId);
+});
+
+// ── Real-time cookie interception ──────────────────────────────────────────
 chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
   if (removed) return;
   if (cause === 'expired' || cause === 'expired_overwrite' || cause === 'evicted') return;
 
   try {
-    const [prefs, rules] = await Promise.all([getPrefs(), getCustomRules()]);
+    const [prefs, rules, paused] = await Promise.all([getPrefs(), getCustomRules(), getPausedDomains()]);
     if (!prefs.autoApply) return;
 
     const domain = cookie.domain.replace(/^\./, '');
+    if (paused.has(domain)) return;
+
     const classification = CookieClassifier.classifyCookie(cookie, domain);
     const { category } = classification;
 
@@ -141,14 +312,20 @@ chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
     }
 
     if (!allowed) {
-      await removeCookie(cookie);
-      await appendBlockedLog([{ ts: Date.now(), domain: cookie.domain.replace(/^\./, ''), category }]);
+      const removed = await removeCookie(cookie);
+      if (removed) {
+        await appendBlockedLog([{ ts: Date.now(), domain, category }]);
+        // Update badge for any active tab on this domain
+        const tabs = await chrome.tabs.query({ url: `*://${domain}/*` });
+        for (const t of tabs) incrementBadge(t.id, 1);
+      }
     }
   } catch {
     // best-effort — ignore errors
   }
 });
 
+// ── Message handlers ───────────────────────────────────────────────────────
 chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
   switch (msg.type) {
     case 'GET_COOKIES':
@@ -175,7 +352,31 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
       return true;
 
     case 'APPLY_PREFS':
-      applyPreferences(msg.url).then(() => reply({ ok: true }));
+      applyPreferences(msg.url, msg.tabId).then(() => reply({ ok: true }));
+      return true;
+
+    case 'GET_TAB_BLOCKED_COUNT':
+      reply({ count: tabBlockedCounts.get(msg.tabId) || 0 });
+      return false;
+
+    case 'PAUSE_DOMAIN':
+      getPausedDomains().then(async set => {
+        set.add(msg.domain);
+        await setPausedDomains(set);
+        reply({ ok: true });
+      });
+      return true;
+
+    case 'RESUME_DOMAIN':
+      getPausedDomains().then(async set => {
+        set.delete(msg.domain);
+        await setPausedDomains(set);
+        reply({ ok: true });
+      });
+      return true;
+
+    case 'GET_PAUSED_DOMAINS':
+      getPausedDomains().then(set => reply({ domains: [...set] }));
       return true;
   }
 });

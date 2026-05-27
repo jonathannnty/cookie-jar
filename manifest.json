@@ -8,9 +8,22 @@
     "activeTab",
     "storage",
     "tabs",
-    "sidePanel"
+    "scripting",
+    "webNavigation"
   ],
   "host_permissions": ["<all_urls>"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Open Cookie Jar"
+    }
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -30,15 +43,12 @@
       "128": "icons/icon128.png"
     }
   },
-  "side_panel": {
-    "default_path": "popup/popup.html"
-  },
   "options_page": "options/options.html",
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
       "js": ["content.js"],
-      "run_at": "document_idle"
+      "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
