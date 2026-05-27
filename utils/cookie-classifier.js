@@ -103,6 +103,16 @@ const CookieClassifier = (() => {
       /^wordpress_logged_in/, /^wp[-_]settings/,
       /^ASP\.NET_SessionId$/, /^__RequestVerificationToken$/,
       /^_session(_id)?$/i, /^session$/i,
+      // Common web-framework session cookies not covered by generic patterns above
+      /^connect\.sid$/i,          // Express.js / Passport.js
+      /^sessionid$/i,              // Django (no underscore prefix)
+      /^__session$/i,              // Firebase Auth session cookie
+      /^session_id$/i,             // Various frameworks
+      /^[-\w]+\.sid$/,             // *.sid suffix (connect.sid, sails.sid, koa.sid …)
+      /^koa\.sess(\.sig)?$/,       // Koa.js session + signature cookie
+      /^io$/,                      // Socket.io session
+      /^\.AspNetCore\./,           // ASP.NET Core cookies (.AspNetCore.Session etc.)
+      /^__RequestVerificationToken$/,
       // Google account / OAuth — SID family and __Secure- prefixed variants
       /^SID$/, /^HSID$/, /^SSID$/, /^LSID$/, /^APISID$/, /^SAPISID$/,
       /^__Secure-1PSID$/, /^__Secure-3PSID$/,
@@ -184,9 +194,14 @@ const CookieClassifier = (() => {
     if (isThirdParty) return { category: 'third-party', isThirdParty, isSession };
     if (isSession)    return { category: 'session',     isThirdParty, isSession };
 
+    // At this point: first-party, has an expiration date, no positive pattern match.
     if (cookie.expirationDate) {
       const daysLeft = (cookie.expirationDate - Date.now() / 1000) / 86400;
       if (daysLeft > 365) return { category: 'tracking', isThirdParty, isSession: false };
+      // ≤ 365-day first-party cookie that passed through all negative pattern checks
+      // (tracking / advertising / analytics) — overwhelmingly session or auth tokens.
+      // Blocking these breaks OAuth callbacks and post-login page rendering.
+      return { category: 'session', isThirdParty, isSession: false };
     }
 
     return { category: 'unknown', isThirdParty, isSession };
