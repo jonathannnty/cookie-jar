@@ -120,7 +120,8 @@ const CookieClassifier = (() => {
       /^__Secure-1PSIDTS$/, /^__Secure-3PSIDTS$/,
       /^__Secure-1PSIDCC$/, /^__Secure-3PSIDCC$/,
       /^__Secure-SSID$/, /^__Secure-APISID$/, /^__Secure-SAPISID$/,
-      /^NID$/, /^1P_JAR$/, /^SOCS$/,
+      /^NID$/, /^1P_JAR$/, /^SOCS$/, /^SIDCC$/,
+      /^LSCO$/, /^GAPS$/, /^G_AUTHUSER_H$/, /^G_ENABLED_IDPS$/,
       // Microsoft / Azure AD auth
       /^ESCTX$/, /^STSSERVICECOOKIE$/, /^buid$/, /^fpc$/,
       /^MSPAuth$/, /^MSPProf$/, /^MSNRPCAuth$/,

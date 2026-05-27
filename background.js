@@ -44,6 +44,28 @@ function isOAuthDomain(hostname) {
   return OAUTH_PASSLIST_SUFFIXES.some(s => h === s.slice(1) || h.endsWith(s));
 }
 
+// Used only in cookies.onChanged where we have the cookie domain, not the tab URL.
+// OAuth providers set cookies on their PARENT domain (e.g. .google.com, .live.com),
+// not the specific auth subdomain (accounts.google.com). isOAuthDomain() misses these
+// because 'google.com' isn't in the passlist — only 'accounts.google.com' is.
+// This function also protects any parent domain whose subdomain is in the passlist.
+function isOAuthCookieDomain(domain) {
+  if (!domain) return false;
+  const h = domain.toLowerCase();
+  if (isOAuthDomain(h)) return true;
+  // If any passlist hostname ends with '.h', then h is a parent of an OAuth provider.
+  // e.g. 'accounts.google.com'.endsWith('.google.com') → protect 'google.com' cookies.
+  for (const host of OAUTH_PASSLIST) {
+    if (host.endsWith('.' + h)) return true;
+  }
+  // Same for suffix-based entries: .okta.com covers okta.com as a parent domain.
+  for (const suffix of OAUTH_PASSLIST_SUFFIXES) {
+    const bare = suffix.slice(1); // '.okta.com' → 'okta.com'
+    if (bare === h || bare.endsWith('.' + h)) return true;
+  }
+  return false;
+}
+
 // ── Consent banner CSS — injected at USER origin (beats all author !important) ──
 // User-origin !important cannot be overridden by any author-origin CSS or JS
 // inline style, making this immune to CMP re-show loops.
@@ -353,7 +375,7 @@ chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
     if (!prefs.autoApply) return;
 
     const domain = cookie.domain.replace(/^\./, '');
-    if (isOAuthDomain(domain)) return;
+    if (isOAuthCookieDomain(domain)) return;
     if (paused.has(domain)) return;
 
     const classification = CookieClassifier.classifyCookie(cookie, domain);
