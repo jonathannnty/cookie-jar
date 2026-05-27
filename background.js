@@ -70,6 +70,19 @@ const CONSENT_BANNER_SELECTORS = [
   '[class*="cookie-modal"]','[class*="cookie-overlay"]','[class*="cookie-popup"]',
   '[class*="cookie-banner"]','[class*="cookie-wall"]',
   '[id*="gdpr"]','[class*="gdpr"]',
+  // Twitch / generic consent-banner class pattern
+  '[class*="consent-banner"]',
+  // Cookie settings / preference panels (H&M and others)
+  '[id*="cookie-settings"]','[class*="cookie-settings"]',
+  '[id*="cookie-preference"]','[class*="cookie-preference"]',
+  '[id*="cookie-pref"]','[class*="cookie-pref"]',
+  '[id*="privacy-preference"]','[class*="privacy-preference"]',
+  '[class*="privacy-banner"]','[class*="privacy-overlay"]',
+  // Manage-cookies floating buttons
+  '[class*="manage-cookies"]','[id*="manage-cookies"]',
+  '[class*="manage-consent"]','[id*="manage-consent"]',
+  // Amazon
+  '#sp-cc','#sp-cc-reallow-btn','.sp-cc','[id*="sp-cc"]',
 ];
 
 const HIDE_PROPS = 'display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;';
