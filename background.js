@@ -146,6 +146,11 @@ const CONSENT_BANNER_SELECTORS = [
   '[class*="manage-consent"]','[id*="manage-consent"]',
   // Amazon
   '#sp-cc','#sp-cc-reallow-btn','.sp-cc','[id*="sp-cc"]',
+  // YouTube consent bump
+  'ytd-consent-bump-v2-renderer',
+  '#consent-bump',
+  '[id*="consent-bump"]',
+  '[class*="consent-bump"]',
 ];
 
 const HIDE_PROPS = 'display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;';
@@ -156,7 +161,7 @@ const CONSENT_BANNER_CSS =
 async function injectConsentCSS(tabId) {
   try {
     await chrome.scripting.insertCSS({
-      target: { tabId, allFrames: false },
+      target: { tabId, allFrames: true },
       css: CONSENT_BANNER_CSS,
       origin: 'USER',
     });

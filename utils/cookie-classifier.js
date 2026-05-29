@@ -134,6 +134,26 @@ const CookieClassifier = (() => {
       // Generic OAuth / OIDC state cookies
       /^oauth[-_]state$/i, /^oauth[-_]nonce$/i,
       /^oidc[-_]nonce$/i, /^oidc[-_]state$/i, /^pkce[-_]verifier$/i,
+      // Spotify
+      /^sp_dc$/, /^sp_t$/,
+      // Reddit
+      /^reddit_session$/,
+      // Netflix
+      /^SecureNetflixId$/, /^NetflixId$/, /^nfvdid$/, /^memclid$/,
+      // Amazon (first-party)
+      /^session-id$/, /^x-main$/, /^at-main$/, /^sess-at-main$/, /^ubid-main$/,
+      // Twitch
+      /^twilight-user$/, /^twitch-jid$/,
+      // Discord
+      /^__dcfduid$/, /^__sdcfduid$/,
+      // Twitter/X
+      /^ct0$/, /^twid$/, /^kdt$/,
+      // TikTok
+      /^sessionid_ss$/, /^ttwid$/, /^tt_chain_token$/,
+      // Instagram/Meta
+      /^ds_user_id$/, /^ig_did$/, /^ig_nonce$/,
+      // Pinterest
+      /^_pinterest_sess$/,
     ],
     advertising: [
       /^IDE$/, /^DSID$/, /^test_cookie$/, /^__gads$/, /^__gpi$/,
@@ -151,7 +171,7 @@ const CookieClassifier = (() => {
       /^_mkto_trk$/, /^hubspotutk$/, /^__hstc$/, /^__hssc$/, /^__hssrc$/,
       /^ki_[ru]$/,
       /^_uetsid$/, /^_uetvid$/, /^_uetmsclkid$/,
-      /^_pin_unauth$/, /^_pinterest_sess$/,
+      /^_pin_unauth$/,
     ],
     analytics: [
       /^_ga($|_)/, /^_gid$/, /^_gat($|_)/, /^__utm/,
@@ -196,16 +216,7 @@ const CookieClassifier = (() => {
     if (isSession)    return { category: 'session',     isThirdParty, isSession };
 
     // At this point: first-party, has an expiration date, no positive pattern match.
-    if (cookie.expirationDate) {
-      const daysLeft = (cookie.expirationDate - Date.now() / 1000) / 86400;
-      if (daysLeft > 365) return { category: 'tracking', isThirdParty, isSession: false };
-      // ≤ 365-day first-party cookie that passed through all negative pattern checks
-      // (tracking / advertising / analytics) — overwhelmingly session or auth tokens.
-      // Blocking these breaks OAuth callbacks and post-login page rendering.
-      return { category: 'session', isThirdParty, isSession: false };
-    }
-
-    return { category: 'unknown', isThirdParty, isSession };
+    return { category: 'session', isThirdParty, isSession: false };
   }
 
   function groupByCategory(cookies) {

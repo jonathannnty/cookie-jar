@@ -165,6 +165,11 @@
     '#sp-cc-reallow-btn',
     '.sp-cc',
     '[id*="sp-cc"]',
+    // YouTube consent bump
+    'ytd-consent-bump-v2-renderer',
+    '#consent-bump',
+    '[id*="consent-bump"]',
+    '[class*="consent-bump"]',
   ];
 
   const HIDE_PROPS = 'display:none !important;visibility:hidden !important;opacity:0 !important;pointer-events:none !important;';
@@ -256,6 +261,7 @@
 // ── Notify background when new cookies are set via document.cookie ─────────
 // Actual cookie reading and removal happens in background.js
 (function () {
+  if (window.self !== window.top) return; // Only override in the top-level frame
   const originalDescriptor = Object.getOwnPropertyDescriptor(Document.prototype, 'cookie');
   if (!originalDescriptor) return;
 
