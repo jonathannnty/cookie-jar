@@ -1,6 +1,6 @@
 /* Cookie Jar — Popup. Matches Figma WidgetPanel design. */
 
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;500;600;700&display=swap');
 
 :root {
   --c-primary:   #8B5A2B;
@@ -61,10 +61,13 @@ body {
 .widget-header-left {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 .widget-header-right {
   display: flex;
   align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
 }
 .header-jar-icon {
   height: 28px;
@@ -100,6 +103,59 @@ body {
 }
 .header-btn:hover img {
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.52));
+}
+
+/* Pause/resume button inline with site label */
+.site-pause-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #7a6350;
+  opacity: 0.65;
+  border-radius: 4px;
+  flex-shrink: 0;
+  pointer-events: auto;
+  transition: opacity 0.15s, color 0.15s;
+}
+.site-pause-btn:hover { opacity: 1; }
+.site-pause-btn.paused { color: #c86a4a; opacity: 0.9; }
+.site-pause-btn .pause-icon { display: block; }
+.site-pause-btn .resume-icon { display: none; }
+.site-pause-btn.paused .pause-icon { display: none; }
+.site-pause-btn.paused .resume-icon { display: block; }
+
+/* ── Site info bar — floats below header, over jar image ── */
+.site-info-bar {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+  padding-top: 12px;
+}
+.header-site-label {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 400;
+  color: #7a6350;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+  background: rgba(250, 242, 228, 0);
+  padding: 2px 10px;
+  border-radius: 999px;
 }
 
 /* ── Jar body ── */

@@ -27,13 +27,27 @@
   <!-- ══ Wooden header bar ══ -->
   <div class="widget-header">
     <div class="widget-header-left">
-      <img class="header-jar-icon" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar">
+      <img class="header-jar-icon" src="../icons/icon128.png" alt="Cookie Jar">
     </div>
     <div class="widget-header-right">
       <button class="header-btn" id="btnFullPage" title="Open full page">
         <img src="../figma/svg/OpenNewLinkIcon.svg" alt="">
       </button>
     </div>
+  </div>
+
+  <!-- ══ Site info bar — below header, above jar body ══ -->
+  <div class="site-info-bar">
+    <span id="siteLabel" class="header-site-label"></span>
+    <button class="site-pause-btn" id="btnPause" title="Pause protection on this site" style="display:none">
+      <svg class="pause-icon" width="14" height="14" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <rect x="4" y="3" width="4" height="14" rx="2"/>
+        <rect x="12" y="3" width="4" height="14" rx="2"/>
+      </svg>
+      <svg class="resume-icon" width="14" height="14" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="4,3 17,10 4,17"/>
+      </svg>
+    </button>
   </div>
 
   <!-- ══ Jar body (cookie list) ══ -->

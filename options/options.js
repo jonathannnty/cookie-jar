@@ -22,9 +22,9 @@ function setStatus(msg, timeout = 0) {
 
 // ── Load ───────────────────────────────────────────────
 async function load() {
-  const data = await chrome.storage.local.get('preferences');
+  const data = await chrome.storage.sync.get('preferences');
   currentPrefs = CookiePrefs.mergePrefs(data.preferences);
-  currentPrefs.onboardingComplete = true;
+
 
   document.getElementById('autoApply').checked = currentPrefs.autoApply !== false;
   document.getElementById('simpleOptional').checked = currentPrefs.simple.optional ?? false;
@@ -102,17 +102,68 @@ document.getElementById('simpleOptional').addEventListener('change', e => {
 
 // ── Save ───────────────────────────────────────────────
 document.getElementById('btnSave').addEventListener('click', async () => {
-  await chrome.storage.local.set({ preferences: currentPrefs });
+  await chrome.storage.sync.set({ preferences: currentPrefs });
   setStatus('Saved ✓', 2500);
 });
 
 // ── Reset ──────────────────────────────────────────────
 document.getElementById('btnReset').addEventListener('click', async () => {
   if (!confirm('Reset all preferences to defaults?')) return;
-  currentPrefs = { ...CookiePrefs.DEFAULT_PREFS, onboardingComplete: true };
-  await chrome.storage.local.set({ preferences: currentPrefs });
+  currentPrefs = { ...CookiePrefs.DEFAULT_PREFS };
+  await chrome.storage.sync.set({ preferences: currentPrefs });
   load();
   setStatus('Reset to defaults ✓', 2500);
+});
+
+// ── Export ─────────────────────────────────────────────
+document.getElementById('btnExport')?.addEventListener('click', async () => {
+  const data = await chrome.storage.sync.get(['preferences', 'customRules', 'pausedDomains']);
+  const payload = JSON.stringify({
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    preferences: data.preferences || null,
+    customRules: data.customRules || null,
+    pausedDomains: data.pausedDomains || [],
+  }, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `cookie-jar-settings-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  setStatus('Exported ✓', 2500);
+});
+
+// ── Import ─────────────────────────────────────────────
+document.getElementById('btnImport')?.addEventListener('click', () => {
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile')?.addEventListener('change', async e => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    if (!parsed || typeof parsed !== 'object') throw new Error('Invalid format');
+    if (parsed.preferences) {
+      currentPrefs = CookiePrefs.mergePrefs(parsed.preferences);
+    
+      await chrome.storage.sync.set({ preferences: currentPrefs });
+    }
+    if (parsed.customRules) {
+      await chrome.storage.sync.set({ customRules: parsed.customRules });
+    }
+    if (Array.isArray(parsed.pausedDomains)) {
+      await chrome.storage.sync.set({ pausedDomains: parsed.pausedDomains });
+    }
+    await load();
+    setStatus('Imported ✓', 2500);
+  } catch {
+    setStatus('Import failed — invalid file', 3000);
+  }
+  e.target.value = '';
 });
 
 load();

@@ -278,6 +278,22 @@
       <div id="advancedRows"></div>
     </section>
 
+    <!-- Data management -->
+    <section class="section">
+      <h2 class="section-title">
+        <span class="section-icon">💾</span>
+        Data
+      </h2>
+      <p style="font-size:13px;color:var(--c-muted);font-family:var(--font-body);margin-bottom:16px;line-height:1.5;">
+        Export your preferences and custom rules as a JSON file, or import a previously exported file to restore settings.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn btn-outline" id="btnExport">Export settings</button>
+        <button class="btn btn-outline" id="btnImport">Import settings</button>
+        <input type="file" id="importFile" accept=".json" style="display:none">
+      </div>
+    </section>
+
   </div><!-- .page -->
 
   <!-- Save bar -->

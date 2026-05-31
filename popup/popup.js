@@ -52,8 +52,12 @@ function toast(msg) {
 
 // ── Preferences ────────────────────────────────────────
 async function loadPrefs() {
-  const data = await chrome.storage.local.get('preferences');
-  currentPrefs = CookiePrefs.mergePrefs(data.preferences);
+  try {
+    const data = await chrome.storage.sync.get('preferences');
+    currentPrefs = CookiePrefs.mergePrefs(data.preferences);
+  } catch {
+    currentPrefs = CookiePrefs.mergePrefs(null);
+  }
 }
 
 // ── Apply prefs to main toggles ────────────────────────
@@ -80,19 +84,62 @@ async function loadTabInfo() {
 
   const label = document.getElementById('siteLabel');
   if (!tab?.url?.startsWith('http')) {
-    label.textContent = 'Not available on this page';
+    if (label) label.textContent = '';
     return;
   }
 
   try {
     const url = new URL(tab.url);
-    const { cookies } = await bg({ type: 'GET_COOKIES', url: tab.url });
+    const [{ cookies }, { count }] = await Promise.all([
+      bg({ type: 'GET_COOKIES', url: tab.url }),
+      bg({ type: 'GET_TAB_BLOCKED_COUNT', tabId: tab.id }),
+    ]);
     const counts = CookieClassifier.countByGroup(cookies || []);
-    label.textContent = `${url.hostname} · ${counts.total} cookie${counts.total === 1 ? '' : 's'} (${counts.necessary} necessary, ${counts.optional} optional)`;
+    if (label) {
+      label.textContent = count > 0
+        ? `${url.hostname} · ${count} blocked`
+        : `${url.hostname} · ${counts.total} cookie${counts.total === 1 ? '' : 's'}`;
+    }
   } catch {
-    label.textContent = '';
+    if (label) label.textContent = '';
   }
 }
+
+// ── Pause state ────────────────────────────────────────
+async function loadPauseState() {
+  const btn = document.getElementById('btnPause');
+  if (!btn) return;
+  if (!currentTab?.url?.startsWith('http')) return;
+
+  try {
+    const domain = new URL(currentTab.url).hostname;
+    const { domains } = await bg({ type: 'GET_PAUSED_DOMAINS' });
+    const paused = (domains || []).includes(domain);
+    btn.classList.toggle('paused', paused);
+    btn.title = paused ? 'Resume protection on this site' : 'Pause protection on this site';
+    btn.style.display = '';
+  } catch {
+    // leave hidden if background is unavailable
+  }
+}
+
+document.getElementById('btnPause')?.addEventListener('click', async () => {
+  if (!currentTab?.url?.startsWith('http')) return;
+  const btn = document.getElementById('btnPause');
+  const domain = new URL(currentTab.url).hostname;
+  const wasPaused = btn.classList.contains('paused');
+  if (wasPaused) {
+    await bg({ type: 'RESUME_DOMAIN', domain });
+    btn.classList.remove('paused');
+    btn.title = 'Pause protection on this site';
+    toast(`Protection resumed on ${domain}`);
+  } else {
+    await bg({ type: 'PAUSE_DOMAIN', domain });
+    btn.classList.add('paused');
+    btn.title = 'Resume protection on this site';
+    toast(`Protection paused on ${domain}`);
+  }
+});
 
 // ── Main toggle changes → update prefs immediately ─────
 Object.keys(TOGGLE_CATS).forEach(id => {
@@ -101,7 +148,7 @@ Object.keys(TOGGLE_CATS).forEach(id => {
   el.addEventListener('change', async () => {
     const cat = TOGGLE_CATS[id];
     currentPrefs.categories[cat] = el.checked;
-    await chrome.storage.local.set({ preferences: currentPrefs });
+    await chrome.storage.sync.set({ preferences: currentPrefs });
     if (currentTab?.url) await bg({ type: 'APPLY_PREFS', url: currentTab.url });
     toast(el.checked ? `${cat} allowed` : `${cat} blocked`);
   });
@@ -160,11 +207,6 @@ document.querySelectorAll('.info-btn').forEach(btn => {
 // ── Settings modal ─────────────────────────────────────
 const settingsOverlay = document.getElementById('settingsOverlay');
 
-document.getElementById('btnSettings')?.addEventListener('click', () => {
-  syncSettingsToggles();
-  settingsOverlay.classList.add('visible');
-  popover.classList.remove('visible');
-});
 
 document.getElementById('btnSettingsCancel').addEventListener('click', () => {
   settingsOverlay.classList.remove('visible');
@@ -177,7 +219,7 @@ document.getElementById('btnSettingsSave').addEventListener('click', async () =>
     currentPrefs.categories[input.dataset.cat] = input.checked;
   });
 
-  await chrome.storage.local.set({ preferences: currentPrefs });
+  await chrome.storage.sync.set({ preferences: currentPrefs });
   if (currentTab?.url) await bg({ type: 'APPLY_PREFS', url: currentTab.url });
 
   settingsOverlay.classList.remove('visible');
@@ -207,4 +249,6 @@ document.getElementById('btnFullPage').addEventListener('click', async () => {
 (async () => {
   await loadPrefs();
   syncMainToggles();
+  await loadTabInfo();
+  loadPauseState();
 })();

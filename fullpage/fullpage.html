@@ -6,8 +6,7 @@
   <title>Cookie Jar</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&family=Fredoka+One&display=swap">
   <link rel="stylesheet" href="fullpage.css">
 </head>
 <body>
@@ -19,6 +18,10 @@
       <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="6" result="n"/>
       <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
     </filter>
+    <filter id="drone" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.025 0.055" numOctaves="5" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
   </defs>
 </svg>
 
@@ -29,19 +32,19 @@
     </clipPath>
   </defs>
   <path d="M0 13.9858C496.401 -3.69179 776.646 -3.87726 1280 13.9858V164.658H0V13.9858Z" fill="#A6723A"/>
-  <image href="../natural-wood-texture-background-surface-of-teak-wooden-desk-texture-free-photo.jpg" x="0" y="0" width="1280" height="165" clip-path="url(#table-clip)" opacity="0.2" preserveAspectRatio="xMidYMid slice"/>
+  <image href="../figma/svg/natural-wood-texture-background-surface-of-teak-wooden-desk-texture-free-photo.jpg" x="0" y="0" width="1280" height="165" clip-path="url(#table-clip)" opacity="0.2" preserveAspectRatio="xMidYMid slice"/>
   <path d="M0 13.9858C496.401 -3.69179 776.646 -3.87726 1280 13.9858V164.658H0V13.9858Z" fill="none" stroke="#675848" stroke-width="1.31602"/>
 </svg>
 
 <!-- ══ TOPBAR ══════════════════════════════════════════ -->
 <header class="topbar">
-  <div class="topbar-left">
-    <img class="topbar-logo" src="../figma/svg/CookieJarLogo.svg" alt="Cookie Jar" width="48" height="48" fetchpriority="high">
+  <button class="topbar-home-btn" id="btnLogoHome" title="Home">
+    <img class="topbar-logo" src="../icons/icon128.png" alt="Cookie Jar" width="48" height="48" fetchpriority="high">
     <div class="topbar-title-group">
       <span class="topbar-title">Cookie Jar</span>
       <span class="topbar-version">v1.00.0</span>
     </div>
-  </div>
+  </button>
   <div class="topbar-right">
     <button class="topbar-btn" id="btnBack" title="Back">
       <img src="../figma/svg/Back.svg" alt="Back" width="32" height="32">
@@ -80,7 +83,7 @@
       <div class="card-two-col">
         <div class="card-col">
           <div class="card-col-heading">
-            <img class="card-cookie-img" src="../figma/svg/SafeCookie.svg" alt="" width="32" height="32">
+            <img class="card-cookie-img" src="../figma/svg/SafeCookie.svg" alt="" width="32" height="32" loading="lazy">
             <span>Safe Cookies</span>
           </div>
           <ul class="card-list">
@@ -96,7 +99,7 @@
         </div>
         <div class="card-col">
           <div class="card-col-heading">
-            <img class="card-cookie-img unsafe-cookie-img" src="../figma/svg/UnsafeCookie.svg" alt="" width="32" height="32">
+            <img class="card-cookie-img unsafe-cookie-img" src="../figma/svg/UnsafeCookie.svg" alt="" width="32" height="32" loading="lazy">
             <span>Unsafe Cookies</span>
           </div>
           <ul class="card-list">
@@ -115,7 +118,7 @@
     <!-- Cookie section cards -->
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26" loading="lazy">
         Session Cookies
       </h2>
       <p class="card-body">Session cookies are temporary cookies that help websites remember you while you use them — like keeping you logged in or saving your cart. They disappear once you close your browser.</p>
@@ -124,7 +127,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26" loading="lazy">
         Authentication Cookies
       </h2>
       <p class="card-body">Authentication cookies help websites know that you're logged in. They store a secure ID so you can stay signed in while browsing without entering your password on every page.</p>
@@ -133,7 +136,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26" loading="lazy">
         Tracking Cookies
       </h2>
       <p class="card-body">Tracking cookies follow your activity across websites to collect data about your behavior, interests, and browsing habits — often to personalize ads and analytics.</p>
@@ -142,7 +145,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26" loading="lazy">
         Third-Party Cookies
       </h2>
       <p class="card-body">Third-party cookies are set by websites other than the one you're currently visiting. They're commonly used for cross-site tracking, targeted advertising, and embedded content like social media buttons.</p>
@@ -151,7 +154,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26" loading="lazy">
         Analytics Cookies
       </h2>
       <p class="card-body">Analytics cookies measure how you interact with a website — which pages you visit, how long you stay, and what you click. While site owners use this data to improve their product, many analytics tools also aggregate your behavior into profiles that can be shared or sold.</p>
@@ -160,7 +163,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26" loading="lazy">
         Advertising Cookies
       </h2>
       <p class="card-body">Advertising cookies follow your browsing habits across sites to build a profile of your interests and serve you targeted ads. They are typically placed by ad networks, not the site you're visiting, and can track you even after you leave.</p>
@@ -169,7 +172,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsUp.svg" alt="" width="26" height="26" loading="lazy">
         Functional Cookies
       </h2>
       <p class="card-body">Functional cookies remember your preferences — like your chosen language, region, or layout — to give you a more personalized experience. Unlike tracking cookies, they typically stay within the site you're visiting and don't follow you elsewhere.</p>
@@ -178,7 +181,7 @@
 
     <div class="info-card">
       <h2 class="card-section-heading">
-        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26">
+        <img class="thumb-img" src="../figma/svg/ThumbsDown.svg" alt="" width="26" height="26" loading="lazy">
         Unknown Cookies
       </h2>
       <p class="card-body">Unknown cookies don't match any recognized category — they may come from third-party scripts, plugins, or services whose purpose hasn't been identified. Since their intent is unclear, it's generally safer to block them until you know what they're doing.</p>
@@ -202,6 +205,10 @@
         <div class="stats-type-btns">
           <button class="stats-btn active" data-type="bar">By Website</button>
           <button class="stats-btn" data-type="line">Over Time</button>
+          <button class="stats-btn" data-type="donut">Breakdown</button>
+          <button class="stats-export-btn" id="statsExportBtn" title="Export blocked log as CSV">
+            <img src="../figma/svg/Download.svg" alt="Download CSV" width="16" height="16">
+          </button>
         </div>
         <div class="stats-period-btns">
           <button class="stats-btn active" data-period="today">Today</button>
@@ -215,6 +222,11 @@
 
     <div class="stats-chart-area">
       <canvas id="statsCanvas"></canvas>
+      <div class="stats-loading" id="statsLoading" aria-label="Loading">
+        <svg viewBox="0 0 36 36" class="stats-spinner" aria-hidden="true">
+          <circle cx="18" cy="18" r="13" fill="none" stroke="#a8876a" stroke-width="2.5" stroke-dasharray="62 20" stroke-linecap="round"/>
+        </svg>
+      </div>
       <p class="stats-empty" id="statsEmpty">No cookies blocked yet — browse a few sites and come back.</p>
     </div>
 
@@ -293,35 +305,40 @@
         <div class="fp-toggle-row">
           <label class="fp-toggle" data-flavor="choc">
             <input type="checkbox" data-cat="session">
-            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-choc.svg" alt=""></div></div>
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-choc.svg" alt="" loading="lazy"></div></div>
           </label>
           <span class="fp-toggle-label">Session Cookies</span>
         </div>
         <div class="fp-toggle-row">
           <label class="fp-toggle" data-flavor="mm">
             <input type="checkbox" data-cat="tracking">
-            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-mm.svg" alt=""></div></div>
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-mm.svg" alt="" loading="lazy"></div></div>
           </label>
           <span class="fp-toggle-label">Tracking Cookies</span>
         </div>
         <div class="fp-toggle-row">
           <label class="fp-toggle" data-flavor="matcha">
             <input type="checkbox" data-cat="authentication">
-            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div></div>
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-matcha.svg" alt="" loading="lazy"></div></div>
           </label>
           <span class="fp-toggle-label">Authentication Cookies</span>
         </div>
         <div class="fp-toggle-row">
           <label class="fp-toggle" data-flavor="redvelvet">
             <input type="checkbox" data-cat="third-party">
-            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div></div>
+            <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-redvelvet.svg" alt="" loading="lazy"></div></div>
           </label>
           <span class="fp-toggle-label">Third-Party Cookies</span>
         </div>
       </div>
 
       <button class="fp-adv-btn" id="fpAdvBtn">
-        Advanced Settings <span class="fp-chevron">▲</span>
+        Advanced Settings
+        <span class="fp-chevron">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z"/>
+          </svg>
+        </span>
       </button>
 
       <div class="fp-adv-section" id="fpAdvSection">
@@ -329,37 +346,181 @@
           <div class="fp-toggle-row">
             <label class="fp-toggle" data-flavor="matcha">
               <input type="checkbox" data-cat="analytics">
-              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-matcha.svg" alt=""></div></div>
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-matcha.svg" alt="" loading="lazy"></div></div>
             </label>
             <span class="fp-toggle-label">Analytics Cookies</span>
           </div>
           <div class="fp-toggle-row">
             <label class="fp-toggle" data-flavor="redvelvet">
               <input type="checkbox" data-cat="advertising">
-              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-redvelvet.svg" alt=""></div></div>
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-redvelvet.svg" alt="" loading="lazy"></div></div>
             </label>
             <span class="fp-toggle-label">Advertising Cookies</span>
           </div>
           <div class="fp-toggle-row">
             <label class="fp-toggle" data-flavor="choc">
               <input type="checkbox" data-cat="functional">
-              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-choc.svg" alt=""></div></div>
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-choc.svg" alt="" loading="lazy"></div></div>
             </label>
             <span class="fp-toggle-label">Functional Cookies</span>
           </div>
           <div class="fp-toggle-row">
             <label class="fp-toggle" data-flavor="mm">
               <input type="checkbox" data-cat="unknown">
-              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-mm.svg" alt=""></div></div>
+              <div class="fp-track"><div class="fp-thumb"><img src="../icons/cookie-mm.svg" alt="" loading="lazy"></div></div>
             </label>
             <span class="fp-toggle-label">Unknown Cookies</span>
           </div>
         </div>
       </div>
+
+      <div class="fp-io-row">
+        <button class="fp-io-btn" id="fpExportSettings">&#8595; Export Settings</button>
+        <button class="fp-io-btn" id="fpImportSettings">&#8593; Import Settings</button>
+        <input type="file" id="fpImportFile" accept=".json" style="display:none">
+      </div>
     </div>
 
   </div>
 </div>
+
+<footer class="site-footer">
+  <span>© 2026 Snickerdoodles</span>
+  <span class="footer-sep">|</span>
+  <a href="#" class="footer-link" data-panel="contact">Contact</a>
+  <span class="footer-sep">|</span>
+  <a href="#" class="footer-link" data-panel="terms">Terms of Use</a>
+  <span class="footer-sep">|</span>
+  <a href="#" class="footer-link" data-panel="privacy">Privacy Policy</a>
+</footer>
+
+<div id="chartTooltip" class="chart-tooltip"></div>
+
+<!-- ══ CONTACT PANEL ══════════════════════════════════════ -->
+<div id="contactPanel" class="legal-panel fp-hidden">
+  <div class="info-card legal-card">
+    <div class="legal-scroll">
+    <h2 class="legal-title">Contact Us</h2>
+    <p class="legal-intro">Have a question, found a bug, or want to share feedback? Fill out the form below and we'll get back to you.</p>
+    <form class="contact-form" id="contactForm" novalidate>
+      <div class="contact-field">
+        <label class="contact-label" for="cfName">Name</label>
+        <input class="contact-input" type="text" id="cfName" name="name" placeholder="Your name" autocomplete="name">
+      </div>
+      <div class="contact-field">
+        <label class="contact-label" for="cfEmail">Email</label>
+        <input class="contact-input" type="email" id="cfEmail" name="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="contact-field">
+        <label class="contact-label" for="cfSubject">Subject</label>
+        <input class="contact-input" type="text" id="cfSubject" name="subject" placeholder="What's this about?">
+      </div>
+      <div class="contact-field">
+        <label class="contact-label" for="cfMessage">Message</label>
+        <textarea class="contact-input contact-textarea" id="cfMessage" name="message" placeholder="Your message…" rows="4"></textarea>
+      </div>
+
+      <!-- reCAPTCHA placeholder -->
+      <div class="recaptcha-box" id="recaptchaBox" aria-label="reCAPTCHA">
+        <div class="recaptcha-left">
+          <button type="button" class="recaptcha-checkbox" id="recaptchaCheck" aria-label="I'm not a robot" aria-checked="false" role="checkbox">
+            <svg class="recaptcha-check-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <polyline points="4 12 9 17 20 6" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <span class="recaptcha-label">I'm not a robot</span>
+        </div>
+        <div class="recaptcha-right">
+          <svg class="recaptcha-logo" viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="30" fill="none" stroke="#4a90d9" stroke-width="4"/>
+            <path d="M32 10 L44 28 H36 V54 H28 V28 H20 Z" fill="#4a90d9"/>
+          </svg>
+          <span class="recaptcha-brand">reCAPTCHA</span>
+          <span class="recaptcha-policy">Privacy · Terms</span>
+        </div>
+      </div>
+
+      <div class="contact-actions">
+        <button type="submit" class="contact-submit" id="contactSubmit">Send Message</button>
+      </div>
+      <p class="contact-success fp-hidden" id="contactSuccess">Thanks! Your message has been sent. We'll be in touch soon.</p>
+    </form>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TERMS OF USE PANEL ═════════════════════════════════ -->
+<div id="termsPanel" class="legal-panel fp-hidden">
+  <div class="info-card legal-card">
+    <div class="legal-scroll">
+    <h2 class="legal-title">Terms of Use</h2>
+    <p class="legal-effective">Effective: May 26, 2026</p>
+
+    <h3 class="legal-heading">1. About Cookie Jar</h3>
+    <p class="legal-body">Cookie Jar ("the Extension") is a browser extension that classifies and manages HTTP cookies encountered during your browsing session. By installing or using the Extension you agree to these Terms. If you do not agree, please uninstall the Extension.</p>
+
+    <h3 class="legal-heading">2. Use of the Extension</h3>
+    <p class="legal-body">The Extension is provided for personal, non-commercial use. You may use it to manage your own browser's cookie behaviour. You may not reverse-engineer, decompile, sublicense, or redistribute the Extension or its source code without prior written permission from Snickerdoodles.</p>
+
+    <h3 class="legal-heading">3. Accuracy of Cookie Classification</h3>
+    <p class="legal-body">Cookie classification is performed algorithmically using pattern-matching rules bundled with the Extension. Classifications are provided on a best-effort basis and may not be perfectly accurate. Snickerdoodles does not guarantee that using the Extension will prevent all tracking, data collection, or browser fingerprinting by third parties.</p>
+
+    <h3 class="legal-heading">4. No Warranty</h3>
+    <p class="legal-body">The Extension is provided "as is" and "as available" without warranties of any kind, whether express or implied, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement. Your use of the Extension is solely at your own risk.</p>
+
+    <h3 class="legal-heading">5. Limitation of Liability</h3>
+    <p class="legal-body">To the fullest extent permitted by applicable law, Snickerdoodles and its contributors shall not be liable for any indirect, incidental, special, exemplary, or consequential damages arising out of or in connection with your use of the Extension, even if advised of the possibility of such damages.</p>
+
+    <h3 class="legal-heading">6. Third-Party Services</h3>
+    <p class="legal-body">The Extension may classify cookies set by third-party websites and services. Snickerdoodles is not affiliated with, endorsed by, or responsible for any third-party websites, services, or their data practices.</p>
+
+    <h3 class="legal-heading">7. Changes to These Terms</h3>
+    <p class="legal-body">We may update these Terms at any time by posting a revised version. Continued use of the Extension after changes are posted constitutes your acceptance of the revised Terms. We encourage you to review these Terms periodically.</p>
+
+    <h3 class="legal-heading">8. Governing Law</h3>
+    <p class="legal-body">These Terms are governed by and construed in accordance with the laws of the State of California, without regard to its conflict-of-law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in San Diego County, California.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PRIVACY POLICY PANEL ══════════════════════════════ -->
+<div id="privacyPanel" class="legal-panel fp-hidden">
+  <div class="info-card legal-card">
+    <div class="legal-scroll">
+    <h2 class="legal-title">Privacy Policy</h2>
+    <p class="legal-effective">Effective: May 26, 2026</p>
+
+    <h3 class="legal-heading">1. Overview</h3>
+    <p class="legal-body">Cookie Jar is built with privacy as a core principle. The Extension operates entirely within your browser and does not transmit any personal data to external servers. This policy explains what data the Extension accesses, how it is used, and how it is stored.</p>
+
+    <h3 class="legal-heading">2. Data We Access</h3>
+    <p class="legal-body">The Extension accesses cookie metadata (name, domain, expiry, and flags such as HttpOnly and Secure) from your browser in order to classify and selectively block cookies. Cookie values are never read, stored, or transmitted. The Extension does not access your browsing history, form data, passwords, or any other personal information.</p>
+
+    <h3 class="legal-heading">3. Local Storage Only</h3>
+    <p class="legal-body">All data generated by the Extension — including your cookie category preferences, custom rules, per-domain overrides, and the blocked-cookie log used for Statistics — is stored exclusively in your browser using <code>chrome.storage.local</code>. This data never leaves your device and is not accessible to Snickerdoodles or any third party.</p>
+
+    <h3 class="legal-heading">4. Cookie Classification</h3>
+    <p class="legal-body">Cookies are classified locally using pattern-matching rules and heuristics bundled within the Extension. No cookie names, domains, or metadata are sent to any external server for classification or analysis. Classification happens entirely on your device.</p>
+
+    <h3 class="legal-heading">5. No Third-Party Analytics or Advertising</h3>
+    <p class="legal-body">The Extension does not integrate any third-party analytics services, advertising networks, or crash-reporting tools. We do not use your data for advertising purposes and we do not sell, rent, or share your data with any third party.</p>
+
+    <h3 class="legal-heading">6. Permissions</h3>
+    <p class="legal-body">The Extension requests only the browser permissions necessary to function: access to cookies (to read and block them), access to the active tab's URL (to apply per-domain rules), and storage (to save your preferences locally). No broader permissions are requested or used.</p>
+
+    <h3 class="legal-heading">7. Children's Privacy</h3>
+    <p class="legal-body">The Extension is not directed at children under the age of 13. We do not knowingly collect any information from children.</p>
+
+    <h3 class="legal-heading">8. Changes to This Policy</h3>
+    <p class="legal-body">We may update this Privacy Policy from time to time to reflect changes in the Extension's functionality or applicable law. The effective date at the top of this page will reflect the most recent revision. We encourage you to review this policy periodically.</p>
+
+    <h3 class="legal-heading">9. Contact</h3>
+    <p class="legal-body">If you have questions or concerns about this Privacy Policy or the Extension's data practices, please reach out using the <a href="#" class="legal-link" data-panel="contact">Contact form</a>.</p>
+    </div>
+  </div>
+</div>
+
+<div class="fp-toast" id="fpToast"></div>
 
 <script src="../utils/cookie-classifier.js"></script>
 <script src="../utils/prefs.js"></script>

@@ -4,7 +4,6 @@
 const CookiePrefs = (() => {
   const DEFAULT_PREFS = {
     mode: 'simple',
-    onboardingComplete: false,
     autoApply: true,
     categories: {
       necessary:      true,
