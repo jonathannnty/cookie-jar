@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280">
+  <title>Cookie Jar — Statistics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="../fullpage/fullpage.css">
+  <style>
+    /* Screenshot: show only the stats panel at full height */
+    .stats-panel { display: flex !important; padding-bottom: 28px; }
+    .site-footer { display: none; }
+  </style>
+</head>
+<body>
+
+<!-- Hand-drawn border filters (referenced by CSS) -->
+<svg width="0" height="0" class="hd-filter-svg" aria-hidden="true">
+  <defs>
+    <filter id="hd" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="6" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="drone" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.025 0.055" numOctaves="5" seed="9" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+<!-- Topbar -->
+<header class="topbar">
+  <button class="topbar-home-btn" title="Home">
+    <img class="topbar-logo" src="../icons/icon128.png" alt="Cookie Jar" width="48" height="48" fetchpriority="high">
+    <div class="topbar-title-group">
+      <span class="topbar-title">Cookie Jar</span>
+      <span class="topbar-version">v1.00.0</span>
+    </div>
+  </button>
+  <div class="topbar-right">
+    <button class="topbar-btn" title="Back">
+      <img src="../figma/svg/Back.svg" alt="Back" width="32" height="32">
+    </button>
+    <button class="topbar-btn" title="Information">
+      <img src="../figma/svg/Home.svg" alt="Home" width="32" height="32">
+    </button>
+    <button class="topbar-btn stats-active" title="Statistics">
+      <img src="../figma/svg/Stats.svg" alt="Statistics" width="32" height="32">
+    </button>
+    <button class="topbar-btn" title="Customize">
+      <img src="../figma/svg/Customize.svg" alt="Customize" width="32" height="32">
+    </button>
+    <button class="topbar-btn" title="Settings">
+      <img src="../figma/svg/Settings.svg" alt="Settings" width="32" height="32">
+    </button>
+  </div>
+</header>
+
+<!-- Stats panel (visible as main content) -->
+<div id="statsPanel" class="stats-panel">
+  <div class="info-card stats-card">
+
+    <div class="stats-header">
+      <div class="stats-headline">
+        <h2 class="stats-title">Cookie Statistics</h2>
+        <p class="stats-count">217 cookies blocked</p>
+      </div>
+      <div class="stats-controls">
+        <div class="stats-type-btns">
+          <button class="stats-btn active">By Website</button>
+          <button class="stats-btn">Over Time</button>
+          <button class="stats-btn">Breakdown</button>
+          <button class="stats-export-btn" title="Export blocked log as CSV">
+            <img src="../figma/svg/Download.svg" alt="Download CSV" width="16" height="16">
+          </button>
+        </div>
+        <div class="stats-period-btns">
+          <button class="stats-btn active">Today</button>
+          <button class="stats-btn">Week</button>
+          <button class="stats-btn">Month</button>
+          <button class="stats-btn">Year</button>
+          <button class="stats-btn">All Time</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-chart-area">
+      <canvas id="statsCanvas"></canvas>
+    </div>
+
+  </div>
+</div>
+
+<script>
+'use strict';
+
+const C = {
+  fill:    '#a8876a',
+  fillAlt: '#c4a48b',
+  text:    '#665747',
+  grid:    'rgba(102,87,71,0.12)',
+  bg:      'transparent',
+  accent:  '#7a5c3f',
+};
+
+const LEGEND_ITEMS = [
+  { label: 'Tracking',  color: '#c9806a', cats: ['tracking', 'third-party', 'advertising'] },
+  { label: 'Analytics', color: '#c4a84e', cats: ['analytics'] },
+  { label: 'Safe',      color: '#8aaa7a', cats: ['session', 'authentication', 'functional'] },
+  { label: 'Unknown',   color: '#a8876a', cats: ['unknown'] },
+];
+
+function setupCanvas(canvas) {
+  const dpr  = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width  = rect.width  * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return { ctx, w: rect.width, h: rect.height };
+}
+
+function roughLine(ctx, x1, y1, x2, y2, amp) {
+  if (amp === undefined) amp = 1.4;
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy) || 1;
+  const nx  = -dy / len, ny = dx / len;
+  const segs = Math.max(4, Math.ceil(len / 10));
+  for (let i = 0; i <= segs; i++) {
+    const t = i / segs;
+    const w = Math.sin(t * Math.PI * 3.8) * amp;
+    if (i === 0) ctx.moveTo(x1 + nx * w,        y1 + ny * w);
+    else         ctx.lineTo(x1 + dx*t + nx * w, y1 + dy*t + ny * w);
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r);
+  ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function drawBarChart(canvas, data) {
+  const { ctx, w, h } = setupCanvas(canvas);
+  ctx.clearRect(0, 0, w, h);
+
+  const isEmpty  = !data.length;
+  const maxVal   = isEmpty ? 5 : Math.max(...data.map(d => d.value), 1);
+  const padLeft  = isEmpty ? 40 : Math.min(160, w * 0.3);
+  const padTop   = 12;
+  const padBot   = 48;
+  const rowCount = isEmpty ? 5 : data.length;
+  const rowH     = (h - padTop - padBot) / rowCount;
+  const barH     = Math.min(rowH * 0.52, 24);
+  const axisY    = h - padBot + 4;
+  const labelFs  = Math.min(11, w * 0.016);
+  const valFs    = Math.min(13, rowH * 0.45);
+  ctx.font = `500 ${valFs}px Fredoka, sans-serif`;
+  const padRight = isEmpty ? 20 : Math.ceil(ctx.measureText(String(maxVal)).width) + 10;
+  const barArea  = w - padLeft - padRight;
+
+  ctx.font = `400 ${labelFs}px Fredoka, sans-serif`;
+  ctx.textBaseline = 'top';
+  ctx.textAlign    = 'center';
+  for (let s = 0; s <= 4; s++) {
+    const gx = padLeft + (s / 4) * barArea;
+    if (s > 0) {
+      ctx.lineWidth   = 0.8;
+      ctx.strokeStyle = C.grid;
+      ctx.beginPath(); roughLine(ctx, gx, padTop, gx, axisY, 0.7); ctx.stroke();
+    }
+    if (!isEmpty) {
+      ctx.fillStyle = C.text;
+      ctx.fillText(Math.round((maxVal / 4) * s), gx, axisY + 5);
+    }
+  }
+
+  const axisColor = isEmpty ? 'rgba(102,87,71,0.3)' : C.text;
+  ctx.strokeStyle = axisColor;
+  ctx.lineWidth   = 1.3;
+  ctx.beginPath(); roughLine(ctx, padLeft, padTop, padLeft, axisY, 1.1); ctx.stroke();
+  ctx.beginPath(); roughLine(ctx, padLeft, axisY, w - padRight + 4, axisY, 0.9); ctx.stroke();
+
+  ctx.font = `500 ${Math.min(13, rowH * 0.45)}px Fredoka, sans-serif`;
+  ctx.textBaseline = 'middle';
+
+  data.forEach((d, i) => {
+    const y   = padTop + i * rowH + rowH / 2;
+    const barW = (d.value / maxVal) * barArea;
+    const r   = Math.min(barH / 2, 6);
+    const bw  = Math.max(barW, r * 2);
+
+    ctx.fillStyle = C.text;
+    ctx.textAlign = 'right';
+    ctx.fillText(d.label.length > 22 ? d.label.slice(0, 21) + '…' : d.label, padLeft - 8, y);
+
+    const hasCats = d.cats && Object.keys(d.cats).length > 0;
+    if (hasCats) {
+      ctx.save();
+      roundRect(ctx, padLeft, y - barH / 2, bw, barH, r);
+      ctx.clip();
+      let segX = padLeft;
+      for (const item of LEGEND_ITEMS) {
+        const count = item.cats.reduce((s, c) => s + (d.cats[c] || 0), 0);
+        if (!count) continue;
+        const segW = (count / maxVal) * barArea;
+        ctx.fillStyle = item.color;
+        ctx.fillRect(segX, y - barH / 2, segW + 1, barH);
+        segX += segW;
+      }
+      ctx.restore();
+    } else {
+      const grad = ctx.createLinearGradient(padLeft, 0, padLeft + barW, 0);
+      grad.addColorStop(0, C.fill);
+      grad.addColorStop(1, C.fillAlt);
+      ctx.fillStyle = grad;
+      roundRect(ctx, padLeft, y - barH / 2, bw, barH, r);
+      ctx.fill();
+    }
+
+    ctx.strokeStyle = hasCats ? 'rgba(102,87,71,0.35)' : C.accent;
+    ctx.lineWidth   = 0.9;
+    ctx.beginPath(); roughLine(ctx, padLeft, y - barH / 2, padLeft + bw, y - barH / 2, 0.6); ctx.stroke();
+    ctx.beginPath(); roughLine(ctx, padLeft, y + barH / 2, padLeft + bw, y + barH / 2, 0.6); ctx.stroke();
+
+    ctx.fillStyle = C.text;
+    ctx.textAlign = 'left';
+    ctx.fillText(d.value, padLeft + bw + 6, y);
+  });
+
+  // Legend
+  ctx.font = `400 ${labelFs}px Fredoka, sans-serif`;
+  ctx.textBaseline = 'middle';
+  const legY     = h - 14;
+  const legItemW = Math.min(88, (w - padLeft - 8) / LEGEND_ITEMS.length);
+  LEGEND_ITEMS.forEach((item, i) => {
+    const lx = padLeft + i * legItemW;
+    ctx.fillStyle = item.color;
+    roundRect(ctx, lx, legY - 5, 11, 10, 3);
+    ctx.fill();
+    ctx.fillStyle = C.text;
+    ctx.textAlign = 'left';
+    ctx.fillText(item.label, lx + 15, legY);
+  });
+}
+
+// Mock data: cookies blocked today by website
+// Sorted descending by count, with realistic category breakdowns
+const MOCK_DATA = [
+  { label: 'x.com (Twitter)',  value: 47, cats: { tracking: 24, 'third-party': 8,  analytics: 11, session: 4 } },
+  { label: 'instagram.com',    value: 38, cats: { tracking: 18, 'third-party': 7,  analytics:  9, session: 4 } },
+  { label: 'facebook.com',     value: 34, cats: { tracking: 19, 'third-party': 5,  analytics:  7, session: 3 } },
+  { label: 'youtube.com',      value: 29, cats: { tracking: 14, 'third-party': 4,  analytics:  8, session: 3 } },
+  { label: 'reddit.com',       value: 22, cats: { tracking: 11,                    analytics:  6, session: 5 } },
+  { label: 'tiktok.com',       value: 19, cats: { tracking: 13, 'third-party': 4,  analytics:  2 } },
+  { label: 'amazon.com',       value: 16, cats: { tracking:  8,                    analytics:  5, advertising: 2, session: 1 } },
+  { label: 'espn.com',         value: 12, cats: { tracking:  7,                    analytics:  3, advertising: 2 } },
+];
+
+window.addEventListener('load', () => {
+  drawBarChart(document.getElementById('statsCanvas'), MOCK_DATA);
+});
+</script>
+
+</body>
+</html>
