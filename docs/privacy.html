@@ -10,19 +10,18 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html, body {
-      height: 100%;
-      overflow: hidden;
+    html {
+      background: #BDA07C;
+    }
+    body {
       background: #BDA07C;
       font-family: 'Fredoka', 'Trebuchet MS', sans-serif;
       -webkit-font-smoothing: antialiased;
-      display: flex;
-      flex-direction: column;
-    }
-    body {
       width: 70vw;
       min-width: 320px;
       margin: 0 auto;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── Topbar ── */
@@ -82,8 +81,6 @@
 
     /* ── Legal panel ── */
     .legal-panel {
-      flex: 1;
-      min-height: 0;
       display: flex;
       flex-direction: column;
       padding-top: 20px;
@@ -113,23 +110,14 @@
     }
 
     .legal-card {
-      flex: 1;
-      min-height: 0;
       display: flex;
       flex-direction: column;
       padding: 20px 28px 28px;
     }
 
     .legal-scroll {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #665747 transparent;
+      overflow: visible;
     }
-    .legal-scroll::-webkit-scrollbar { width: 6px; }
-    .legal-scroll::-webkit-scrollbar-track { background: transparent; }
-    .legal-scroll::-webkit-scrollbar-thumb { background: #665747; border-radius: 6px; }
 
     .legal-title {
       font-size: clamp(18px, 2.2vw, 30px);
@@ -171,10 +159,6 @@
 
     /* ── Footer ── */
     .site-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
       height: 28px;
       display: flex;
       align-items: center;
@@ -182,8 +166,7 @@
       gap: 8px;
       font-size: clamp(9px, 0.72vw, 11px);
       color: #665747;
-      z-index: 5;
-      pointer-events: none;
+      margin-top: 8px;
     }
     .footer-sep { opacity: 0.45; }
   </style>
