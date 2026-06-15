@@ -560,5 +560,12 @@ chrome.runtime.onMessage.addListener((msg, sender, reply) => {
     case 'GET_PAUSED_DOMAINS':
       getPausedDomains().then(set => reply({ domains: [...set] }));
       return true;
+
+    case 'IS_AUTOCONSENT_ON': {
+      let host = '';
+      try { host = new URL(msg.url).hostname; } catch (_) {}
+      isAutoconsentEnabledFor(host).then(on => reply({ on }));
+      return true;
+    }
   }
 });

@@ -1,5 +1,20 @@
 'use strict';
 
+// Ask the background whether auto-consent is enabled for this frame's domain.
+// When enabled, the vendored autoconsent engine owns banner handling and the
+// legacy CSS/JS hide must stand down (its display:none would block reject clicks).
+// When disabled (or the background is unavailable), install the legacy hide.
+function shouldRunLegacyHide() {
+  return new Promise((resolve) => {
+    try {
+      chrome.runtime.sendMessage({ type: 'IS_AUTOCONSENT_ON', url: location.href }, (resp) => {
+        if (chrome.runtime.lastError) return resolve(true);
+        resolve(!(resp && resp.on));
+      });
+    } catch (_) { resolve(true); }
+  });
+}
+
 // ── Cookie consent banner suppression ─────────────────────────────────────
 // Hides cookie consent UIs as soon as they appear in the DOM so the user
 // never has to interact with them. Covers generic id/class patterns and the
@@ -7,7 +22,7 @@
 // Didomi, Quantcast, SourcePoint, TrustArc, Shopify, Ketch, etc.).
 // Runs at document_start so CSS is injected before the page renders, preventing
 // any flash of consent banners.
-(function suppressCookieBanners() {
+function suppressCookieBanners() {
   const SELECTORS = [
     // Generic id/class patterns
     '#cookie-consent-banner',
@@ -256,7 +271,9 @@
     attributes: true,
     attributeFilter: ['style', 'class', 'hidden', 'aria-hidden'],
   });
-})();
+}
+
+shouldRunLegacyHide().then((run) => { if (run) suppressCookieBanners(); });
 
 // ── Notify background when new cookies are set via document.cookie ─────────
 // Actual cookie reading and removal happens in background.js

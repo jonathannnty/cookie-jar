@@ -80,6 +80,42 @@
       "run_at": "document_start",
       "all_frames": true,
       "match_about_blank": true
+    },
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "exclude_matches": [
+        "https://accounts.google.com/*",
+        "https://login.microsoftonline.com/*",
+        "https://login.live.com/*",
+        "https://account.live.com/*",
+        "https://login.windows.net/*",
+        "https://account.microsoft.com/*",
+        "https://accounts.microsoft.com/*",
+        "https://appleid.apple.com/*",
+        "https://auth.apple.com/*",
+        "https://idmsa.apple.com/*",
+        "https://gsa.apple.com/*",
+        "https://auth.atlassian.com/*",
+        "https://id.atlassian.com/*",
+        "https://login.atlassian.net/*",
+        "https://login.salesforce.com/*",
+        "https://identity.salesforce.com/*",
+        "https://auth.services.mozilla.com/*",
+        "https://accounts.firefox.com/*",
+        "*://*.okta.com/*",
+        "*://*.oktapreview.com/*",
+        "*://*.auth0.com/*",
+        "*://*.onelogin.com/*",
+        "*://*.pingidentity.com/*",
+        "*://*.duosecurity.com/*",
+        "*://*.duo.com/*",
+        "*://*.forgerock.io/*",
+        "*://*.forgerock.com/*"
+      ],
+      "js": ["vendor/autoconsent/content.bundle.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
   "web_accessible_resources": [
