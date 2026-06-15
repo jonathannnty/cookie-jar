@@ -1,0 +1,17 @@
+{
+  "name": "cookie-jar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cookie Jar Chrome extension build/test tooling.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-autoconsent.mjs",
+    "test": "node --test test/**/*.test.js",
+    "test:integration": "node test-consent-banners.js"
+  },
+  "devDependencies": {
+    "@duckduckgo/autoconsent": "14.95.0",
+    "esbuild": "^0.23.0",
+    "playwright": "^1.45.0"
+  }
+}
