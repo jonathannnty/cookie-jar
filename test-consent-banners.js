@@ -163,7 +163,15 @@ async function findVisibleConsentElements(page) {
 
 async function testSite(context, site) {
   const page = await context.newPage();
-  const result = { label: site.label, url: site.url, cmp: site.cmp, status: 'pass', issues: [], screenshot: null };
+  const result = { label: site.label, url: site.url, cmp: site.cmp, status: 'pass', issues: [], screenshot: null, scrollLocked: false, autoconsentLogs: [] };
+
+  // Best-effort: capture autoconsent/CMP activity from the console
+  page.on('console', msg => {
+    const text = msg.text();
+    if (/autoconsent|cmp|consent|cookie/i.test(text)) {
+      result.autoconsentLogs.push(text.slice(0, 200));
+    }
+  });
 
   try {
     await page.goto(site.url, { waitUntil: 'domcontentloaded', timeout: 30000 });
@@ -171,6 +179,13 @@ async function testSite(context, site) {
     await page.waitForTimeout(10000);
 
     const visible = await findVisibleConsentElements(page);
+
+    // Scroll-lock check: a banner that's hidden but left overflow:hidden on <body>
+    // means the opt-out is incomplete — the page is still locked.
+    result.scrollLocked = await page.evaluate(() => {
+      const o = getComputedStyle(document.body).overflow;
+      return o === 'hidden' && document.body.scrollHeight > window.innerHeight;
+    }).catch(() => false);
 
     // Diagnostic: verify our injected CSS is present and its computed effect
     result.cssProbe = await page.evaluate(() => {
@@ -210,9 +225,13 @@ async function testSite(context, site) {
     await page.screenshot({ path: screenshotPath, fullPage: false });
     result.screenshot = screenshotPath;
 
+    // PASS only when banner is gone AND the page is not scroll-locked.
     if (visible.length > 0) {
       result.status = 'FAIL';
       result.issues = visible;
+    } else if (result.scrollLocked) {
+      result.status = 'FAIL';
+      result.issues = [{ type: 'scroll-lock', message: 'Banner hidden but body.overflow=hidden — opt-out incomplete' }];
     }
   } catch (err) {
     result.status = 'ERROR';
@@ -229,12 +248,15 @@ function printResult(r) {
   const pad  = r.label.padEnd(14);
   const p = r.cssProbe;
   const fmt = (el) => el ? `${el.computedDisplay}/${el.computedVisibility}(inline:${el.inlineDisplay||'–'}/${el.inlineDisplayPriority||'–'})` : 'N/A';
+  const lockStr = r.scrollLocked ? ' scroll-locked' : '';
   const probeStr = p ? ` | tag:${p.hasOurStyleTag} ketch:${fmt(p.ketch)} shopify:${fmt(p.shopify)} ot:${fmt(p.oneTrust)}` : '';
-  console.log(`  ${icon} ${pad} [${r.cmp.padEnd(12)}] ${r.status}${r.status !== 'pass' ? probeStr : ''}`);
+  console.log(`  ${icon} ${pad} [${r.cmp.padEnd(12)}] ${r.status}${lockStr}${r.status !== 'pass' ? probeStr : ''}`);
   if (r.issues.length) {
     for (const iss of r.issues) {
       if (iss.error) {
         console.log(`      error: ${iss.error}`);
+      } else if (iss.type === 'scroll-lock') {
+        console.log(`      scroll-lock: ${iss.message}`);
       } else if (iss.type === 'known') {
         console.log(`      known selector still visible: ${iss.selector}`);
       } else {
@@ -244,6 +266,9 @@ function printResult(r) {
         console.log(`        text: "${i.text?.slice(0, 80)}"`);
       }
     }
+  }
+  if (r.autoconsentLogs && r.autoconsentLogs.length) {
+    console.log(`      autoconsent activity (${r.autoconsentLogs.length} msg): ${r.autoconsentLogs[0]}`);
   }
 }
 
