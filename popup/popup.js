@@ -67,6 +67,8 @@ function syncMainToggles() {
     if (!el) continue;
     el.checked = currentPrefs.categories[cat] !== false;
   }
+  const acToggle = document.getElementById('autoConsentToggle');
+  if (acToggle) acToggle.checked = currentPrefs.autoConsent?.enabled !== false;
 }
 
 // ── Apply prefs to settings modal toggles ─────────────
@@ -139,6 +141,13 @@ document.getElementById('btnPause')?.addEventListener('click', async () => {
     btn.title = 'Resume protection on this site';
     toast(`Protection paused on ${domain}`);
   }
+});
+
+// ── Auto-consent toggle → update prefs immediately ─────
+document.getElementById('autoConsentToggle')?.addEventListener('change', async e => {
+  currentPrefs.autoConsent.enabled = e.target.checked;
+  await chrome.storage.sync.set({ preferences: currentPrefs });
+  toast(e.target.checked ? 'Auto-reject banners on' : 'Auto-reject banners off');
 });
 
 // ── Main toggle changes → update prefs immediately ─────

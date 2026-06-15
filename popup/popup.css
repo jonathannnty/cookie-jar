@@ -561,3 +561,47 @@ body {
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 .hidden { display: none !important; }
+
+/* ── Auto-consent quick-toggle row ── */
+.autoconsent-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 16px 6px;
+  border-bottom: 1px solid rgba(102,87,71,0.18);
+  background: rgba(255,248,238,0.7);
+}
+.autoconsent-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #7A6350;
+  letter-spacing: 0.01em;
+}
+/* Compact pill toggle reusing the site-pause visual language */
+.autoconsent-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px; height: 20px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.autoconsent-toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+.autoconsent-track {
+  position: absolute; inset: 0;
+  background: #D4C1AE;
+  border-radius: 10px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.autoconsent-track::before {
+  content: '';
+  position: absolute;
+  width: 16px; height: 16px;
+  top: 2px; left: 2px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.autoconsent-toggle input:checked ~ .autoconsent-track { background: #8B5A2B; }
+.autoconsent-toggle input:checked ~ .autoconsent-track::before { transform: translateX(16px); }
