@@ -87,6 +87,12 @@ const CookieClassifier = (() => {
       /^AWSALB$/, /^AWSALBCORS$/, /^AWSELBCORS$/,
       /^incap_ses_/, /^nlbi_/, /^visid_incap_/,
       /^OptanonConsent$/, /^OptanonAlertBoxClosed$/,
+      // Didomi consent record
+      /^didomi_token$/, /^didomi_dcs$/,
+      // Google Additional Consent (rides alongside euconsent-v2)
+      /^addtl_consent$/,
+      // TrustArc consent record
+      /^notice_gdpr_prefs$/, /^notice_preferences$/, /^TAconsentID$/, /^cmapi_gtm_bl$/,
       /^gdpr/i, /^usprivacy$/, /^cc_cookie$/,
     ],
     authentication: [
