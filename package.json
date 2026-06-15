@@ -7,7 +7,7 @@
   "scripts": {
     "build": "node scripts/build-autoconsent.mjs",
     "test": "node --test test/**/*.test.js",
-    "test:integration": "node test-consent-banners.js"
+    "test:integration": "node test-consent-banners.cjs"
   },
   "devDependencies": {
     "@duckduckgo/autoconsent": "14.95.0",
