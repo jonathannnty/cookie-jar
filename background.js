@@ -2,6 +2,7 @@
 
 importScripts('./utils/cookie-classifier.js');
 importScripts('./utils/prefs.js');
+importScripts('./vendor/autoconsent/background-helpers.bundle.js');
 
 // ── OAuth / Identity-Provider passlist ───────────────────────────────────────
 // These domains exist solely for authentication. Any interference (cookie
@@ -166,6 +167,95 @@ async function injectConsentCSS(tabId) {
       origin: 'USER',
     });
   } catch (_) { /* tab may not be injectable (chrome://, extension pages, etc.) */ }
+}
+
+// ── Autoconsent engine ───────────────────────────────────────────────────────
+// Vendored DuckDuckGo autoconsent (MPL-2.0). The isolated-world content bundle
+// detects the CMP and clicks "reject all"; this worker supplies rules/config and
+// runs the engine's fixed MAIN-world snippet functions (no eval / remote code).
+const AUTOCONSENT_MESSAGE_TYPES = new Set([
+  'init', 'eval', 'popupFound', 'optOutResult', 'optInResult',
+  'autoconsentDone', 'selfTestResult', 'autoconsentError', 'report', 'visualDelay',
+]);
+
+let _compactRules = null;
+let _consentomatic = null;
+
+async function loadAutoconsentRules() {
+  if (_compactRules && _consentomatic) return;
+  const [compact, com] = await Promise.all([
+    fetch(chrome.runtime.getURL('vendor/autoconsent/rules/compact-rules.json')).then(r => r.json()),
+    fetch(chrome.runtime.getURL('vendor/autoconsent/rules/consentomatic.json')).then(r => r.json()),
+  ]);
+  _compactRules = compact;
+  _consentomatic = com.consentomatic; // file is { consentomatic: {...} }
+}
+
+function autoconsentConfig(prefs, enabled) {
+  return {
+    enabled,
+    autoAction: prefs.autoConsent.action,
+    disabledCmps: [],
+    enablePrehide: true,
+    enableCosmeticRules: true,
+    enableFilterList: true,
+    detectRetries: 20,
+    isMainWorld: false,
+    prehideTimeout: 2000,
+    visualTest: false,
+    logs: { lifecycle: false, rulesteps: false, evals: false, errors: false, messages: false },
+  };
+}
+
+async function isAutoconsentEnabledFor(hostname) {
+  if (isOAuthDomain(hostname)) return false;
+  const [prefs, paused] = await Promise.all([getPrefs(), getPausedDomains()]);
+  if (!prefs.autoConsent.enabled) return false;
+  if (paused.has(hostname)) return false;
+  return true;
+}
+
+function evalAutoconsentSnippet(tabId, frameId, snippetId) {
+  return chrome.scripting.executeScript({
+    target: { tabId, frameIds: [frameId] },
+    world: 'MAIN',
+    func: self.autoconsentEvalSnippets[snippetId],
+  });
+}
+
+async function handleAutoconsentMessage(msg, sender) {
+  if (!sender.tab) return;
+  const tabId = sender.tab.id;
+  const frameId = sender.frameId;
+  switch (msg.type) {
+    case 'init': {
+      const senderUrl = sender.url || `${sender.origin}/`;
+      let hostname;
+      try { hostname = new URL(senderUrl).hostname; } catch { return; }
+      await loadAutoconsentRules();
+      const prefs = await getPrefs();
+      const enabled = await isAutoconsentEnabledFor(hostname);
+      const compact = self.autoconsentFilterCompactRules(_compactRules, {
+        url: senderUrl,
+        mainFrame: frameId === 0,
+      });
+      chrome.tabs.sendMessage(tabId, {
+        type: 'initResp',
+        rules: { autoconsent: [], consentomatic: _consentomatic, compact },
+        config: autoconsentConfig(prefs, enabled),
+      }, { frameId });
+      return;
+    }
+    case 'eval': {
+      const [res] = await evalAutoconsentSnippet(tabId, frameId, msg.snippetId);
+      chrome.tabs.sendMessage(tabId, { id: msg.id, type: 'evalResp', result: res.result }, { frameId });
+      return;
+    }
+    // popupFound / optOutResult / optInResult / autoconsentDone / selfTestResult /
+    // autoconsentError / report / visualDelay — acknowledged; no action needed for opt-out.
+    default:
+      return;
+  }
 }
 
 // ── Per-tab blocked-cookie counts (in-memory, cleared on navigation) ──────
@@ -349,7 +439,9 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     try { oauthPage = isOAuthDomain(new URL(tab.url).hostname); } catch (_) {}
     if (!oauthPage) {
       applyPreferences(tab.url, tabId);
-      if (tab.url.startsWith('http')) injectConsentCSS(tabId);
+      if (tab.url.startsWith('http')) {
+        isAutoconsentEnabledFor(new URL(tab.url).hostname).then(on => { if (!on) injectConsentCSS(tabId); });
+      }
     }
   }
 });
@@ -363,7 +455,7 @@ chrome.webNavigation.onCommitted.addListener(({ tabId, url, frameId }) => {
   if (frameId !== 0) return; // main frame only
   if (!url.startsWith('http')) return;
   try { if (isOAuthDomain(new URL(url).hostname)) return; } catch (_) { return; }
-  injectConsentCSS(tabId);
+  isAutoconsentEnabledFor(new URL(url).hostname).then(on => { if (!on) injectConsentCSS(tabId); });
 });
 
 chrome.tabs.onRemoved.addListener((tabId) => {
@@ -412,7 +504,11 @@ chrome.cookies.onChanged.addListener(async ({ removed, cookie, cause }) => {
 });
 
 // ── Message handlers ───────────────────────────────────────────────────────
-chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
+chrome.runtime.onMessage.addListener((msg, sender, reply) => {
+  if (msg && AUTOCONSENT_MESSAGE_TYPES.has(msg.type)) {
+    handleAutoconsentMessage(msg, sender).catch(() => {});
+    return false;
+  }
   switch (msg.type) {
     case 'GET_COOKIES':
       getClassifiedCookies(msg.url).then(cookies => reply({ cookies }));
