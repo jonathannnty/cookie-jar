@@ -25,7 +25,7 @@ await build({
 
 // Rules: resolve via the package's exported subpaths (known to resolve from Task 1).
 let pkgRulesDir = null;
-for (const f of ['compact-rules.json', 'rules.json', 'consentomatic.json']) {
+for (const f of ['compact-rules.json', 'consentomatic.json']) {
   const srcPath = require.resolve('@duckduckgo/autoconsent/rules/' + f);
   pkgRulesDir = path.dirname(srcPath);
   copyFileSync(srcPath, path.join(rulesOut, f));

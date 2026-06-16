@@ -194,7 +194,7 @@ async function loadAutoconsentRules() {
 function autoconsentConfig(prefs, enabled) {
   return {
     enabled,
-    autoAction: prefs.autoConsent.action,
+    autoAction: 'optOut', // reject-only: this extension never auto-accepts consent
     disabledCmps: [],
     enablePrehide: true,
     enableCosmeticRules: true,

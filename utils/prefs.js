@@ -22,7 +22,6 @@ const CookiePrefs = (() => {
     },
     autoConsent: {
       enabled: true,
-      action:  'optOut', // 'optOut' rejects; 'optIn' accepts (advanced)
     },
   };
 

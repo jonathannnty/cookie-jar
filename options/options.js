@@ -31,10 +31,6 @@ async function load() {
 
   const autoConsentEnabled = currentPrefs.autoConsent?.enabled !== false;
   document.getElementById('autoConsentEnabled').checked = autoConsentEnabled;
-  document.getElementById('autoConsentAction').value = currentPrefs.autoConsent?.action || 'optOut';
-  document.getElementById('autoConsentActionRow').style.opacity = autoConsentEnabled ? '1' : '0.45';
-  document.getElementById('autoConsentAction').disabled = !autoConsentEnabled;
-
   setMode(currentPrefs.mode || 'simple', false);
   buildAdvancedRows();
   applySavedToAdvanced();
@@ -104,15 +100,9 @@ document.getElementById('autoApply').addEventListener('change', e => {
 
 document.getElementById('autoConsentEnabled').addEventListener('change', e => {
   currentPrefs.autoConsent.enabled = e.target.checked;
-  document.getElementById('autoConsentActionRow').style.opacity = e.target.checked ? '1' : '0.45';
-  document.getElementById('autoConsentAction').disabled = !e.target.checked;
   setStatus('Unsaved changes');
 });
 
-document.getElementById('autoConsentAction').addEventListener('change', e => {
-  currentPrefs.autoConsent.action = e.target.value;
-  setStatus('Unsaved changes');
-});
 document.getElementById('simpleOptional').addEventListener('change', e => {
   currentPrefs.simple.optional = e.target.checked;
   setStatus('Unsaved changes');
@@ -127,7 +117,7 @@ document.getElementById('btnSave').addEventListener('click', async () => {
 // ── Reset ──────────────────────────────────────────────
 document.getElementById('btnReset').addEventListener('click', async () => {
   if (!confirm('Reset all preferences to defaults?')) return;
-  currentPrefs = { ...CookiePrefs.DEFAULT_PREFS };
+  currentPrefs = CookiePrefs.mergePrefs(CookiePrefs.DEFAULT_PREFS);
   await chrome.storage.sync.set({ preferences: currentPrefs });
   load();
   setStatus('Reset to defaults ✓', 2500);
