@@ -187,7 +187,7 @@
     <img class="topbar-logo" src="icon128.png" alt="Cookie Jar" width="48" height="48" fetchpriority="high">
     <div class="topbar-title-group">
       <span class="topbar-title">Cookie Jar</span>
-      <span class="topbar-version">v1.00.0</span>
+      <span class="topbar-version">v1.1.0</span>
     </div>
   </div>
 </header>
@@ -197,7 +197,7 @@
     <div class="legal-scroll">
 
       <h2 class="legal-title">Privacy Policy</h2>
-      <p class="legal-effective">Effective: May 26, 2026</p>
+      <p class="legal-effective">Effective: June 15, 2026</p>
 
       <h3 class="legal-heading">1. Overview</h3>
       <p class="legal-body">Cookie Jar is built with privacy as a core principle. The extension operates entirely within your browser and does not transmit any personal data to external servers. This policy explains what data the extension accesses, how it is used, and how it is stored.</p>
@@ -215,10 +215,10 @@
       <p class="legal-body">The extension does not integrate any third-party analytics services, advertising networks, or crash-reporting tools. We do not use your data for advertising purposes and we do not sell, rent, or share your data with any third party.</p>
 
       <h3 class="legal-heading">6. Permissions</h3>
-      <p class="legal-body">The extension requests only the browser permissions necessary to function: access to cookies (to read and block them), access to the active tab's URL (to apply per-domain rules), storage (to save your preferences locally), scripting (to inject consent-banner suppression CSS), and webNavigation (to apply that CSS at the earliest point in page load). No broader permissions are requested or used.</p>
+      <p class="legal-body">The extension requests only the browser permissions necessary to function: access to cookies (to read and block them), access to the active tab's URL (to apply per-domain rules), storage (to save your preferences locally), scripting (to detect cookie-consent dialogs and choose "reject" on your behalf, and to inject fallback hiding styles), and webNavigation (to act at the earliest point in page load). No broader permissions are requested or used.</p>
 
-      <h3 class="legal-heading">7. Consent Banner Suppression</h3>
-      <p class="legal-body">The extension injects a stylesheet that hides cookie consent banners on websites you visit. This is done entirely within your browser — no information about which banners were encountered is collected, stored, or transmitted.</p>
+      <h3 class="legal-heading">7. Cookie Consent Banners</h3>
+      <p class="legal-body">When enabled, the extension automatically responds to cookie-consent dialogs on the websites you visit by selecting "reject" or "decline" on your behalf, so you are opted out of non-essential cookies without clicking through each banner. This is done entirely within your browser using a bundled, open-source rule set (DuckDuckGo's autoconsent, MPL-2.0); when auto-reject is turned off, it falls back to simply hiding the banners with a stylesheet. No information about which banners or websites you encountered is collected, stored, or transmitted, and no remote code is ever downloaded or executed.</p>
 
       <h3 class="legal-heading">8. Children's Privacy</h3>
       <p class="legal-body">The extension is not directed at children under the age of 13. We do not knowingly collect any information from children.</p>

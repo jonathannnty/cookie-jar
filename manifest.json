@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Cookie Jar",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Understand and control the cookies websites place in your browser. Organized by type — necessary, session, tracking, and more.",
   "permissions": [
     "cookies",
