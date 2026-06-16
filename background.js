@@ -223,6 +223,26 @@ function evalAutoconsentSnippet(tabId, frameId, snippetId) {
   });
 }
 
+// After the engine resolves consent on a frame, some sites leave a residual
+// scroll-lock (html/body overflow:hidden) that they would normally clear via
+// their own — now suppressed — banner. Force-restore scrolling on that frame.
+// Gated on the engine's success signal so a legitimate modal is never unlocked.
+function clearScrollLockIn(tabId, frameId) {
+  chrome.scripting.executeScript({
+    target: { tabId, frameIds: [frameId] },
+    func: () => {
+      for (const el of [document.documentElement, document.body]) {
+        if (!el) continue;
+        const cs = getComputedStyle(el);
+        if (cs.overflow === 'hidden' || cs.overflowY === 'hidden') {
+          el.style.setProperty('overflow', 'auto', 'important');
+          el.style.setProperty('overflow-y', 'auto', 'important');
+        }
+      }
+    },
+  }).catch(() => {});
+}
+
 async function handleAutoconsentMessage(msg, sender) {
   if (!sender.tab) return;
   const tabId = sender.tab.id;
@@ -251,8 +271,16 @@ async function handleAutoconsentMessage(msg, sender) {
       chrome.tabs.sendMessage(tabId, { id: msg.id, type: 'evalResp', result: res.result }, { frameId });
       return;
     }
-    // popupFound / optOutResult / optInResult / autoconsentDone / selfTestResult /
-    // autoconsentError / report / visualDelay — acknowledged; no action needed for opt-out.
+    case 'optOutResult':
+      // A real CMP opt-out succeeded — clear any residual scroll-lock it left.
+      if (msg.result) clearScrollLockIn(tabId, frameId);
+      return;
+    case 'autoconsentDone':
+      // Engine finished resolving consent on this frame — ensure the page scrolls.
+      clearScrollLockIn(tabId, frameId);
+      return;
+    // popupFound / optInResult / selfTestResult / autoconsentError / report /
+    // visualDelay — acknowledged; no action needed.
     default:
       return;
   }
