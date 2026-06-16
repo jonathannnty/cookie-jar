@@ -7,10 +7,12 @@
   "scripts": {
     "build": "node scripts/build-autoconsent.mjs",
     "test": "node --test test/**/*.test.js",
-    "test:integration": "node test-consent-banners.cjs"
+    "test:integration": "node test-consent-banners.cjs",
+    "package": "node scripts/package.mjs"
   },
   "devDependencies": {
     "@duckduckgo/autoconsent": "14.95.0",
+    "archiver": "^7.0.0",
     "esbuild": "^0.23.0",
     "playwright": "^1.45.0"
   }
