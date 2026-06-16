@@ -8,7 +8,8 @@
     "build": "node scripts/build-autoconsent.mjs",
     "test": "node --test test/**/*.test.js",
     "test:integration": "node test-consent-banners.cjs",
-    "package": "node scripts/package.mjs"
+    "package": "node scripts/package.mjs",
+    "smoke": "node scripts/smoke.mjs"
   },
   "devDependencies": {
     "@duckduckgo/autoconsent": "14.95.0",
