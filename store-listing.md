@@ -112,3 +112,32 @@ WHO IT'S FOR
 Cookie Jar is for anyone who wants a cleaner, more private browsing experience without giving up the convenience of staying logged in everywhere. It works quietly in the background — you don't need to think about it. If you want to dig deeper, the statistics panel and customize rules are there. If you just want to install it and forget about it, the defaults handle everything sensibly from day one.
 
 No accounts. No subscriptions. No data collection. Just a cookie jar that keeps the right cookies in and the wrong ones out.
+
+---
+
+## Permission Justifications
+*(paste into Developer Dashboard → "Privacy practices" → each permission's justification box; all are within the 1,000-character limit)*
+
+**cookies**
+The cookies permission is the core of this extension. It reads cookies set on each page the user visits, classifies them by category (necessary, session, authentication, functional, tracking, advertising, analytics, third-party, unknown), and removes the ones the user has configured to block. Real-time blocking also listens to cookies.onChanged so newly set cookies are evaluated and removed immediately.
+
+**activeTab**
+Used to read the URL of the currently active tab so the popup can display the cookies present on that page, show the per-tab blocked-cookie count in the toolbar badge, and apply per-domain custom rules the user has set.
+
+**storage**
+Stores user preferences (which cookie categories to block), custom rules (per-domain, overrides, blocked, name patterns, max-age limits), paused domains, and the blocked-cookie log used for the Statistics view — all locally in chrome.storage.local and chrome.storage.sync. No data is sent to any external server.
+
+**tabs**
+Used to read the active tab's URL (so the popup shows the right site's cookies), update the toolbar badge count when cookies are blocked on a tab, open the onboarding page after installation, and return the user to their previous tab from the full-page view.
+
+**scripting**
+Used by the extension's automatic consent-rejection feature. It calls chrome.scripting.executeScript with world:'MAIN' to run a small, fixed set of helper functions bundled inside the extension that read a page's consent JavaScript API (such as the IAB TCF __tcfapi) so a "reject" choice can be applied. These are predefined, bundled functions — no remote or dynamically fetched code is ever executed. It also calls chrome.scripting.insertCSS to inject fallback hiding styles for consent banners when auto-reject is off.
+
+**webNavigation**
+Listens to webNavigation.onCommitted to inject the fallback consent-banner hiding CSS at the earliest possible moment — before page content renders — so that when the auto-reject engine is disabled, banners are hidden without a visible flicker, and to apply the engine's per-site setting early in navigation.
+
+**host permissions (&lt;all_urls&gt;)**
+Required so the extension can read and remove cookies, and detect and automatically reject cookie-consent banners, on any website the user visits — not just a predetermined list. This must work across all pages. The extension never transmits any cookie data externally; all processing happens on-device.
+
+**Are you using remote code?** — **No.** All logic ships inside the package: the consent engine's MAIN-world helpers are a fixed, bundled function registry and the consent rules are bundled JSON. Nothing is fetched from a remote source and executed.
+
